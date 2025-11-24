@@ -1,9 +1,13 @@
 backend:
   name: git-gateway
-  branch: main
+  branch: master
+  # API root for GitHub integration
+  api_root: https://api.github.com
+  site_domain: swai-electronics-cms.netlify.app # Your Netlify CMS domain
 
 # Maxnate Branding
-site_url: https://maxnate.com
+site_url: https://maxnate-africa.github.io/swai-electronics # Main GitHub Pages site
+display_url: https://maxnate-africa.github.io/swai-electronics
 logo_url: https://maxnate.com/assets/images/logo/cms-01.png
 
 media_folder: "assets/images/products"

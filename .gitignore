@@ -6,6 +6,9 @@ _site/
 vendor/
 .bundle/
 
+# Deployment artifacts
+netlify-deploy/
+
 # Ruby
 *.gem
 *.rbc

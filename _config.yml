@@ -2,8 +2,8 @@ title: Swai Electronics
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
   Premium Quality Electronics in Mwanza.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/swai-electronics" # the subpath of your site, e.g. /blog
+url: "https://maxnate-africa.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: jekyllrb
 github_username: jekyll
 
@@ -55,3 +55,11 @@ pagination:
   sort_reverse: false
 exclude:
   - assets/images/gude-2025-11-23.log
+  - netlify.toml
+  - deploy.ps1
+  - .github/
+  - README.md
+  - "*.md"
+  - CNAME
+  - Gemfile
+  - Gemfile.lock

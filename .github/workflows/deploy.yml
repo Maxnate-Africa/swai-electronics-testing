@@ -1,0 +1,62 @@
+name: Deploy to GitHub Pages and Netlify
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '3.1'
+        bundler-cache: true
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: |
+        bundle install
+        npm install -g netlify-cli
+        
+    - name: Build Jekyll site
+      run: bundle exec jekyll build
+      env:
+        JEKYLL_ENV: production
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./_site
+        exclude_assets: 'cms-admin/**'
+        
+    - name: Prepare CMS admin for Netlify
+      run: |
+        mkdir -p netlify-deploy
+        cp -r _site/cms-admin/* netlify-deploy/
+        # Copy necessary assets for CMS
+        mkdir -p netlify-deploy/assets
+        cp -r _site/assets/css netlify-deploy/assets/ 2>/dev/null || true
+        cp -r _site/assets/images netlify-deploy/assets/ 2>/dev/null || true
+        
+    - name: Deploy CMS to Netlify
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+      run: |
+        netlify deploy --prod --dir=netlify-deploy --site=${{ secrets.NETLIFY_SITE_ID }} --auth=${{ secrets.NETLIFY_AUTH_TOKEN }}
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
