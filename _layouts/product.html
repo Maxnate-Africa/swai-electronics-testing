@@ -1,0 +1,179 @@
+layout: default
+---
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="{{ '/' | relative_url }}">Home</a>
+  {% if page.category %}
+  <a href="{{ '/' | relative_url }}?category={{ page.category | uri_escape }}">{{ page.category | capitalize }}</a>
+  {% endif %}
+  <span aria-current="page">{{ page.title }}</span>
+  </nav>
+
+<div class="product-detail">
+  <div class="product-detail-media">
+    {% if page.image %}
+    {% assign base = page.image | replace: '.png','' %}
+    <picture>
+      <source type="image/webp" srcset="{{ base }}-300.webp 300w, {{ base }}-600.webp 600w, {{ base }}.webp" sizes="(max-width: 600px) 100vw, 50vw">
+      <img src="{{ page.image | relative_url }}" alt="{{ page.title }}" loading="lazy" srcset="{{ base }}-300.png 300w, {{ base }}-600.png 600w, {{ page.image | relative_url }}" sizes="(max-width: 600px) 100vw, 50vw">
+    </picture>
+    {% endif %}
+  </div>
+  <div class="product-detail-info">
+     <h1>
+       {{ page.title }}
+       {% assign stock_val = page.stock | default: 1 %}
+       {% if stock_val == 0 %}
+       <span class="badge out-stock" title="Currently unavailable">Out of Stock</span>
+       {% else %}
+       <span class="badge in-stock" title="Available now">In Stock</span>
+       {% endif %}
+     </h1>
+     {% if page.price %}
+     <p class="price">TSh {{ page.price | format_price }}</p>
+     {% endif %}
+    <a href="https://wa.me/{{ site.whatsapp_phone }}?text={{ page.whatsapp_message | uri_escape }}" target="_blank" class="whatsapp-btn whatsapp-btn-detail">
+      ORDER ON WHATSAPP
+    </a>
+    <div class="product-sections">
+      {% if content %}
+      <section class="product-section">
+        <h2>Overview</h2>
+        <div class="expandable" id="overview">
+          {{ content }}
+          <div class="fade-mask" aria-hidden="true"></div>
+        </div>
+        <button class="expand-toggle" data-target="overview" aria-expanded="false" aria-controls="overview">Explore more</button>
+      </section>
+      {% endif %}
+
+      {% if page.features %}
+      <section class="product-section">
+        <h2>Key Features</h2>
+        <ul class="features-list">
+          {% for f in page.features %}
+          <li>{{ f }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      {% if page.specs %}
+      <section class="product-section">
+        <h2>Specifications</h2>
+        <dl class="specs-grid">
+          {% if page.specs.first and page.specs.first.label %}
+            {% for s in page.specs %}
+            <div class="spec-row"><dt>{{ s.label }}</dt><dd>{{ s.value }}</dd></div>
+            {% endfor %}
+          {% else %}
+            {% for item in page.specs %}
+            <div class="spec-row"><dt>{{ item[0] }}</dt><dd>{{ item[1] }}</dd></div>
+            {% endfor %}
+          {% endif %}
+        </dl>
+      </section>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% assign related_all = site.products | where: 'category', page.category %}
+{% assign related = related_all | where_exp: 'p', 'p.url != page.url' %}
+{% if related and related.size > 0 %}
+<section class="related-section">
+  <h2>Related Products</h2>
+  <div class="related-grid">
+    {% for r in related limit:4 %}
+    <a class="related-card" href="{{ r.url | relative_url }}" aria-label="View {{ r.title }}">
+      <div class="image-container">
+        {% if r.image %}
+        {% assign base = r.image | replace: '.png','' %}
+        <picture>
+          <source type="image/webp" srcset="{{ base }}-300.webp 300w, {{ base }}-600.webp 600w, {{ base }}.webp" sizes="(max-width: 600px) 50vw, 200px">
+          <img src="{{ r.image | relative_url }}" alt="{{ r.title }}" loading="lazy" srcset="{{ base }}-300.png 300w, {{ base }}-600.png 600w, {{ r.image | relative_url }}" sizes="(max-width: 600px) 50vw, 200px">
+        </picture>
+        {% else %}
+        <div class="placeholder-image"></div>
+        {% endif %}
+      </div>
+      <div class="related-info">
+        <div class="related-title">{{ r.title }}</div>
+        <div class="related-meta">
+          <span class="price">TSh {{ r.price | format_price }}</span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": {{ page.title | jsonify }},
+  {% if page.brand %}
+  "brand": { "@type": "Brand", "name": {{ page.brand | jsonify }} },
+  {% endif %}
+  {% if page.image %}
+  "image": [{{ page.image | relative_url | jsonify }}],
+  {% endif %}
+  {% if page.price %}
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "TZS",
+    "price": {{ page.price | jsonify }},
+    "availability": "https://schema.org/{% if stock_val == 0 %}OutOfStock{% else %}InStock{% endif %}",
+    "url": {{ page.url | relative_url | jsonify }}
+  }
+  {% endif %}
+}
+</script>
+
+{% include trust.html %}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": {{ '/' | relative_url | absolute_url | jsonify }}
+    }{% if page.category %},
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ page.category | capitalize | jsonify }},
+      "item": {{ '/' | relative_url | append: '?category=' | append: page.category | absolute_url | jsonify }}
+    }{% endif %},
+    {
+      "@type": "ListItem",
+      "position": {% if page.category %}3{% else %}2{% endif %},
+      "name": {{ page.title | jsonify }},
+      "item": {{ page.url | relative_url | absolute_url | jsonify }}
+    }
+  ]
+}
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggles = document.querySelectorAll('.expand-toggle');
+    toggles.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const id = this.getAttribute('data-target');
+        const target = document.getElementById(id);
+        if (!target) return;
+        const expanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', String(!expanded));
+        target.classList.toggle('is-expanded');
+        this.textContent = expanded ? 'Explore more' : 'Show less';
+      });
+    });
+  });
+  </script>

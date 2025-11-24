@@ -1,0 +1,83 @@
+<div class="consent-banner" id="consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+  <div class="consent-text">
+    We use cookies to analyze traffic and improve your experience. You can accept or reject analytics.
+  </div>
+  <div class="consent-actions">
+    <button class="btn btn-secondary" id="consent-reject" type="button">Reject</button>
+    <button class="btn btn-primary" id="consent-accept" type="button">Accept</button>
+  </div>
+  <button class="consent-close" id="consent-close" type="button" aria-label="Dismiss">×</button>
+  <span class="sr-only" aria-hidden="true"></span>
+</div>
+
+<script>
+  (function() {
+    var GA_ID = {{ site.google_analytics_id | jsonify }};
+    var FB_ID = {{ site.meta_pixel_id | jsonify }};
+
+    function loadGA() {
+      if (!GA_ID) return;
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      window.gtag = gtag;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
+      document.head.appendChild(s);
+      gtag('js', new Date());
+      gtag('config', GA_ID, { anonymize_ip: true });
+    }
+
+    function loadFB() {
+      if (!FB_ID) return;
+      !(function(f,b,e,v,n,t,s){
+        if(f.fbq) return; n=f.fbq=function(){ n.callMethod? n.callMethod.apply(n,arguments):n.queue.push(arguments) };
+        if(!f._fbq) f._fbq=n; n.push=n; n.loaded=!0; n.version='2.0'; n.queue=[];
+        t=b.createElement(e); t.async=!0; t.src=v; s=b.getElementsByTagName(e)[0]; s.parentNode.insertBefore(t,s);
+      })(window, document, 'script', 'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', FB_ID);
+      fbq('track', 'PageView');
+    }
+
+    function loadAnalytics(){
+      try { loadGA(); loadFB(); } catch (e) { /* no-op */ }
+    }
+
+    function hideBanner(){
+      var el = document.getElementById('consent-banner');
+      if (el) el.style.display = 'none';
+    }
+
+    function showBanner(){
+      var el = document.getElementById('consent-banner');
+      if (el) el.style.display = 'grid';
+    }
+
+    var choice = null;
+    try { choice = localStorage.getItem('siteConsent'); } catch(e) {}
+    if (choice === 'accepted') {
+      hideBanner();
+      loadAnalytics();
+    } else if (choice === 'rejected') {
+      hideBanner();
+    } else {
+      showBanner();
+    }
+
+    document.getElementById('consent-accept')?.addEventListener('click', function(){
+      try { localStorage.setItem('siteConsent', 'accepted'); } catch(e) {}
+      hideBanner();
+      loadAnalytics();
+    });
+    document.getElementById('consent-reject')?.addEventListener('click', function(){
+      try { localStorage.setItem('siteConsent', 'rejected'); } catch(e) {}
+      hideBanner();
+    });
+    document.getElementById('consent-close')?.addEventListener('click', function(){
+      hideBanner();
+    });
+
+    // Optional: expose simple API to reset consent
+    window.resetSiteConsent = function(){ try { localStorage.removeItem('siteConsent'); } catch(e) {} showBanner(); };
+  })();
+</script>

@@ -1,0 +1,87 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# Maxnate Branding
+site_url: https://maxnate.com
+logo_url: https://maxnate.com/assets/images/logo/cms-01.png
+
+media_folder: "assets/images/products"
+public_folder: "/assets/images/products"
+
+collections:
+  - name: "products"
+    label: "Products"
+    folder: "_products"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Brand", name: "brand", widget: "string", required: false }
+      - { label: "Category", name: "category", widget: "select", options: ["televisions", "audio", "home-appliances"] }
+      - label: "Pricing & Sales"
+        name: "pricing_info"
+        widget: "object"
+        collapsed: false
+        summary: "Regular: {{fields.price}} TSh | Sale: {{fields.sale_price}} TSh"
+        fields:
+          - { label: "Regular Price (TSh)", name: "price", widget: "number", value_type: "int", min: 1000, hint: "Regular selling price in Tanzanian Shillings" }
+          - { label: "Sale Price (TSh)", name: "sale_price", widget: "number", value_type: "int", min: 100, required: false, hint: "💡 Enter sale price to show in 'Sale Items' filter. Must be lower than regular price." }
+          - { label: "Sale Start Date", name: "sale_start", widget: "datetime", required: false, hint: "⏰ When sale pricing becomes active (leave empty for immediate activation)" }
+          - { label: "Sale End Date", name: "sale_end", widget: "datetime", required: false, hint: "⏰ When sale pricing expires (leave empty for permanent sale)" }
+      - { label: "Image", name: "image", widget: "image" }
+      - label: "Availability"
+        name: "stock"
+        widget: "select"
+        options:
+          - { label: "In Stock", value: 1 }
+          - { label: "Out of Stock", value: 0 }
+        default: 1
+      - { label: "WhatsApp Message", name: "whatsapp_message", widget: "string", hint: "Custom message when customers contact via WhatsApp" }
+      - { label: "Short Description", name: "description", widget: "text", required: false, hint: "Brief product description for listings" }
+      - { label: "Long Description", name: "long_description", widget: "markdown", required: false, hint: "Detailed product information" }
+
+  - name: "offers"
+    label: "Offers"
+    folder: "_offers"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "ID (optional)", name: "id", widget: "string", required: false, hint: "Used for client-side persistence; defaults to slug" }
+      - { label: "Start", name: "start", widget: "datetime", required: false }
+      - { label: "End", name: "end", widget: "datetime", required: false }
+      - { label: "Priority", name: "priority", widget: "number", value_type: "int", min: 0, default: 0, hint: "Higher priority shows first" }
+      - { label: "Published", name: "published", widget: "boolean", default: true }
+      - { label: "Image", name: "image", widget: "image", required: false }
+      - { label: "CTA Text", name: "cta_text", widget: "string", required: false, default: "Shop now" }
+      - { label: "CTA URL", name: "cta_url", widget: "string", required: false }
+      - { label: "WhatsApp Message (optional)", name: "whatsapp_message", widget: "string", required: false, hint: "Defaults to ‘Hi, I want to claim the offer: <Title>’" }
+      - { label: "Body", name: "body", widget: "markdown", required: false }
+      - label: "Tags"
+        name: "tags"
+        widget: "list"
+        required: false
+      - label: "Key Features"
+        name: "features"
+        widget: "list"
+        summary: "Feature: {{fields.item}}"
+        field: { label: "Feature", name: "item", widget: "string" }
+        required: false
+      - label: "Specifications"
+        name: "specs"
+        widget: "list"
+        required: false
+        summary: "{{fields.label}}: {{fields.value}}"
+        fields:
+          - { label: "Label", name: "label", widget: "string" }
+          - { label: "Value", name: "value", widget: "string" }
+      - label: "SEO"
+        name: "seo"
+        widget: "object"
+        collapsed: true
+        required: false
+        fields:
+          - { label: "SEO Title", name: "title", widget: "string", required: false }
+          - { label: "SEO Description", name: "description", widget: "text", required: false }
+          - { label: "SEO Image", name: "image", widget: "image", required: false }

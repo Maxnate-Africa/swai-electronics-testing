@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Swai Electronics CMS - Powered by Maxnate</title>
+  <link href="config.yml" type="text/yaml" rel="cms-config-url">
+  <!-- Netlify Identity Widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+  <!-- Decap CMS renders here -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  
+  <!-- Custom Preview Templates for Enhanced Pricing -->
+  <script src="preview-templates.js"></script>
+  
+  <!-- CMS Enhancement Script -->
+  <script>
+    // Initialize CMS enhancements
+    CMS.init({
+      config: {
+        load_config_file: true
+      }
+    });
+    
+    // Enhanced validation for pricing and sale filter integration
+    CMS.registerEventListener({
+      name: 'prePersist',
+      handler: ({ entry }) => {
+        const data = entry.get('data');
+        const pricingInfo = data.get('pricing_info') || data;
+        
+        const price = pricingInfo.get('price');
+        const salePrice = pricingInfo.get('sale_price');
+        
+        // Validate sale price is lower than regular price
+        if (salePrice && price && salePrice >= price) {
+          throw new Error('❌ Sale price (TSh ' + salePrice.toLocaleString() + ') must be lower than regular price (TSh ' + price.toLocaleString() + ')');
+        }
+        
+        // Validate sale dates
+        const startDate = pricingInfo.get('sale_start');
+        const endDate = pricingInfo.get('sale_end');
+        
+        if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
+          throw new Error('❌ Sale start date must be before end date');
+        }
+        
+        // Show success message for sale items
+        if (salePrice && price && salePrice < price) {
+          const discount = Math.round(((price - salePrice) / price) * 100);
+          console.log(`✅ Sale item created! ${discount}% discount will appear in Sale Items filter`);
+        }
+        
+        return entry;
+      }
+    });
+  </script>
+</body>
+</html>

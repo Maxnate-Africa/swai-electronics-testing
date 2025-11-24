@@ -1,0 +1,487 @@
+---
+layout: default
+title: Swai Electronics | Tanzania
+pagination:
+  enabled: true
+---
+
+<div class="hero-text">
+    <h2>PREMIUM<br>QUALITY.</h2>
+    <p><i>Affordable. Reliable. Exceptional.</i></p>
+</div>
+
+<div class="product-controls">
+    <input type="text" id="searchBox" placeholder="Search products..." aria-label="Search products">
+    <select id="sortSelect" aria-label="Sort products">
+        <option value="">Sort</option>
+        <option value="name-asc">Name A–Z</option>
+        <option value="name-desc">Name Z–A</option>
+        <option value="price-asc">Price Low–High</option>
+        <option value="price-desc">Price High–Low</option>
+    </select>
+</div>
+
+<!-- Product Grid -->
+<div class="product-grid" id="product-list">
+    {% assign products_list = paginator.docs | default: site.products %}
+    {% for product in products_list %}
+    {% assign effective_price = product | get_effective_price %}
+    {% assign on_sale = product | is_on_sale %}
+    <div class="product-card" data-category="{{ product.category }}" data-price="{{ effective_price | replace: ',', '' }}" data-on-sale="{{ on_sale }}">
+        <div class="image-container">
+                        {% if product.image %}
+                        {% assign base = product.image | replace: '.png','' %}
+                        <picture>
+                            <source type="image/webp" srcset="{{ base }}-300.webp 300w, {{ base }}-600.webp 600w, {{ base }}.webp" sizes="(max-width: 480px) 50vw, (max-width: 1024px) 25vw, 250px">
+                            <img src="{{ product.image | relative_url }}" alt="{{ product.title }}" style="width:100%; height:100%; object-fit:cover;" loading="lazy" srcset="{{ base }}-300.png 300w, {{ base }}-600.png 600w, {{ product.image | relative_url }}" sizes="(max-width: 480px) 50vw, (max-width: 1024px) 25vw, 250px">
+                        </picture>
+                        {% else %}
+                        <div class="placeholder-image"></div>
+                        {% endif %}
+            <a href="https://wa.me/{{ site.whatsapp_phone }}?text={{ product.whatsapp_message | uri_escape }}" target="_blank" class="whatsapp-btn">
+                Press your Order
+            </a>
+        </div>
+                <div class="product-info">
+                        <h3>
+                            {{ product.title }}
+                            {% assign stock_val = product.stock | default: 1 %}
+                            {% if stock_val == 0 %}
+                            <span class="badge out-stock" title="Currently unavailable">Out of Stock</span>
+                            {% else %}
+                            <span class="badge in-stock" title="Available now">In Stock</span>
+                            {% endif %}
+                        </h3>
+                        
+                        {% if product.brand %}
+                        <div class="product-brand">{{ product.brand }}</div>
+                        {% endif %}
+                        
+
+                        
+                        <div class="pricing">
+                            {% assign on_sale = product | is_on_sale %}
+                            {% assign regular_price = product | get_product_price: 'price' %}
+                            {% assign sale_price = product | get_product_price: 'sale_price' %}
+                            {% if on_sale %}
+                                <div class="sale-badge">SALE</div>
+                                <div class="price-group">
+                                    <span class="price current-price">{{ sale_price | format_price }}</span>
+                                    <span class="price original-price">{{ regular_price | format_price }}</span>
+                                </div>
+                                <div class="discount-info">
+                                    <span class="discount-percent">{{ regular_price | calculate_discount: sale_price }}% OFF</span>
+                                    <span class="savings-amount">{{ regular_price | format_savings: sale_price }}</span>
+                                </div>
+                            {% else %}
+                                <span class="price">{{ regular_price | format_price }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="product-actions">
+                            <button class="quick-view-btn" data-product="{{ forloop.index0 }}">Quick View</button>
+                        </div>
+                </div>
+    </div>
+    {% endfor %}
+ </div>
+
+<!-- Quick View Modal -->
+<div id="quickViewModal" class="modal-overlay">
+    <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <div class="modal-body">
+            <div class="modal-image">
+                <img id="modalImage" src="" alt="">
+            </div>
+            <div class="modal-details">
+                <h2 id="modalTitle"></h2>
+                <div id="modalBrand" class="modal-brand"></div>
+                <div id="modalStock" class="modal-stock"></div>
+                <div id="modalPricing" class="modal-pricing"></div>
+                
+                <div class="modal-description">
+                    <h4>Description</h4>
+                    <div id="modalDescription"></div>
+                </div>
+                
+                <div id="modalFeatures" class="modal-features">
+                    <h4>Key Features</h4>
+                    <ul id="modalFeaturesList"></ul>
+                </div>
+                
+                <div id="modalSpecs" class="modal-specifications">
+                    <h4>Specifications</h4>
+                    <div id="modalSpecsList"></div>
+                </div>
+                
+                <div class="modal-actions">
+                    <a id="modalWhatsAppBtn" href="" target="_blank" class="whatsapp-btn-large">
+                        Order via WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Data for JavaScript -->
+<script type="application/json" id="productData">
+[
+    {% for product in products_list %}
+    {
+        "title": {{ product.title | jsonify }},
+        "brand": {{ product.brand | default: "" | jsonify }},
+        "image": {{ product.image | relative_url | jsonify }},
+        "stock": {{ product.stock | default: 1 }},
+        "short_description": {{ product.short_description | default: "" | jsonify }},
+        "long_description": {{ product.long_description | default: "" | jsonify }},
+        "key_features": {{ product.key_features | default: "[]" | jsonify }},
+        "specifications": {{ product.specifications | default: "[]" | jsonify }},
+        "whatsapp_message": {{ product.whatsapp_message | default: "" | jsonify }},
+        "pricing": {
+            "regular_price": {{ product | get_product_price: 'price' | replace: ',', '' }},
+            "sale_price": {{ product | get_product_price: 'sale_price' | replace: ',', '' }},
+            "on_sale": {{ product | is_on_sale }}
+        }
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+]
+</script>
+
+{% if paginator.total_pages and paginator.total_pages > 1 %}
+<div class="pagination">
+    {% if paginator.previous_page %}
+        <a class="page-link prev" href="{{ paginator.previous_page_path | relative_url }}">&larr; Prev</a>
+    {% endif %}
+    {% for page in (1..paginator.total_pages) %}
+        {% if page == paginator.page %}
+            <span class="current">{{ page }}</span>
+        {% else %}
+            <a class="page-link" href="{{ paginator.page_path | replace: ':num', page | relative_url }}">{{ page }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if paginator.next_page %}
+        <a class="page-link next" href="{{ paginator.next_page_path | relative_url }}">Next &rarr;</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterLinks = document.querySelectorAll('.filter-link');
+        const productCards = Array.from(document.querySelectorAll('.product-card'));
+        const searchBox = document.getElementById('searchBox');
+        const sortSelect = document.getElementById('sortSelect');
+
+        function applyFiltersAndSort() {
+            const activeFilter = document.querySelector('.filter-link.active')?.getAttribute('data-filter') || 'all';
+            const query = searchBox.value.trim().toLowerCase();
+            const sortValue = sortSelect.value;
+
+            let visibleCards = [];
+
+            productCards.forEach(card => {
+                const category = card.getAttribute('data-category');
+                const onSale = card.getAttribute('data-on-sale') === 'true';
+                const name = card.querySelector('.product-info h3').textContent.toLowerCase();
+                
+                let matchesCategory = activeFilter === 'all' || 
+                                    category === activeFilter || 
+                                    (activeFilter === 'on-sale' && onSale);
+                let matchesSearch = !query || name.includes(query);
+                
+                if (matchesCategory && matchesSearch) {
+                    card.style.display = 'block';
+                    visibleCards.push(card);
+                    
+                    // Add sale indicator animation
+                    const saleBadge = card.querySelector('.sale-badge');
+                    if (saleBadge) {
+                        setTimeout(() => {
+                            saleBadge.style.animation = 'sale-pulse 2s ease-in-out infinite';
+                        }, Math.random() * 1000);
+                    }
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Show results count for sale filter
+            if (activeFilter === 'on-sale') {
+                const resultsInfo = document.createElement('div');
+                resultsInfo.className = 'filter-results';
+                resultsInfo.innerHTML = `<span class="results-count">${visibleCards.length} sale item${visibleCards.length !== 1 ? 's' : ''} found</span>`;
+                
+                const grid = document.getElementById('product-list');
+                const existingInfo = grid.parentElement.querySelector('.filter-results');
+                if (existingInfo) existingInfo.remove();
+                grid.parentElement.insertBefore(resultsInfo, grid);
+            } else {
+                const existingInfo = document.querySelector('.filter-results');
+                if (existingInfo) existingInfo.remove();
+            }
+            
+            if (sortValue) {
+                visibleCards.sort((a, b) => {
+                    const nameA = a.querySelector('.product-info h3').textContent.toLowerCase();
+                    const nameB = b.querySelector('.product-info h3').textContent.toLowerCase();
+                    const priceA = parseFloat(a.getAttribute('data-price')) || 0;
+                    const priceB = parseFloat(b.getAttribute('data-price')) || 0;
+                    switch (sortValue) {
+                        case 'name-asc': return nameA.localeCompare(nameB);
+                        case 'name-desc': return nameB.localeCompare(nameA);
+                        case 'price-asc': return priceA - priceB;
+                        case 'price-desc': return priceB - priceA;
+                        default: return 0;
+                    }
+                });
+                const grid = document.getElementById('product-list');
+                visibleCards.forEach(card => grid.appendChild(card));
+            }
+        }
+
+        // Preselect category from URL query (e.g., /?category=televisions or /?filter=on-sale)
+        const params = new URLSearchParams(window.location.search);
+        const presetCategory = params.get('category') || params.get('filter');
+        if (presetCategory) {
+            const match = Array.from(filterLinks).find(l => l.getAttribute('data-filter') === presetCategory);
+            if (match) {
+                filterLinks.forEach(l => l.classList.remove('active'));
+                match.classList.add('active');
+                applyFiltersAndSort();
+            }
+        }
+
+        filterLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                filterLinks.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                applyFiltersAndSort();
+            });
+        });
+
+        searchBox.addEventListener('input', applyFiltersAndSort);
+        sortSelect.addEventListener('change', applyFiltersAndSort);
+
+        // Enhanced image loading functionality
+        function initializeImageLoading() {
+            const imageContainers = document.querySelectorAll('.image-container');
+            
+            imageContainers.forEach(container => {
+                const img = container.querySelector('img');
+                if (img) {
+                    // Add loading class initially
+                    container.classList.add('loading');
+                    
+                    // Handle successful image load
+                    img.onload = function() {
+                        container.classList.remove('loading');
+                        container.classList.add('loaded');
+                        img.classList.add('loaded');
+                        
+                        // Check if WebP is supported
+                        if (img.src.includes('.webp')) {
+                            container.classList.add('webp-supported');
+                        }
+                    };
+                    
+                    // Handle image load error
+                    img.onerror = function() {
+                        container.classList.remove('loading');
+                        container.classList.add('error');
+                        console.log('Failed to load image:', img.src);
+                    };
+                    
+                    // If image is already cached and loaded
+                    if (img.complete) {
+                        img.onload();
+                    }
+                } else {
+                    // Handle placeholder images
+                    const placeholder = container.querySelector('.placeholder-image');
+                    if (placeholder) {
+                        container.classList.add('loaded');
+                    }
+                }
+            });
+        }
+
+        // Count and update sale items
+        function updateSaleCounter() {
+            const saleItems = productCards.filter(card => 
+                card.getAttribute('data-on-sale') === 'true'
+            );
+            const saleFilter = document.querySelector('.sale-filter');
+            const currentText = saleFilter.textContent.replace(/\s*\(\d+\)$/, '');
+            saleFilter.innerHTML = `${currentText} <span class="sale-count">(${saleItems.length})</span>`;
+            
+            // Add pulsing effect if there are sale items
+            if (saleItems.length > 0) {
+                saleFilter.classList.add('has-sales');
+            }
+        }
+        
+        // Initialize image loading on page load
+        initializeImageLoading();
+        
+        // Initialize sale counter
+        updateSaleCounter();
+        
+        // Quick View Modal Functionality
+        function initializeQuickView() {
+            const modal = document.getElementById('quickViewModal');
+            const closeBtn = modal.querySelector('.modal-close');
+            const quickViewBtns = document.querySelectorAll('.quick-view-btn');
+            const productData = JSON.parse(document.getElementById('productData').textContent);
+            
+            // Open modal
+            quickViewBtns.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productIndex = parseInt(this.getAttribute('data-product'));
+                    const product = productData[productIndex];
+                    
+                    if (product) {
+                        populateModal(product);
+                        modal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            });
+            
+            // Close modal
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Escape key to close
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+            
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            function populateModal(product) {
+                // Basic info
+                document.getElementById('modalTitle').textContent = product.title;
+                document.getElementById('modalImage').src = product.image;
+                document.getElementById('modalImage').alt = product.title;
+                
+                // Brand
+                const brandEl = document.getElementById('modalBrand');
+                if (product.brand) {
+                    brandEl.textContent = product.brand;
+                    brandEl.style.display = 'block';
+                } else {
+                    brandEl.style.display = 'none';
+                }
+                
+                // Stock status
+                const stockEl = document.getElementById('modalStock');
+                if (product.stock === 0) {
+                    stockEl.innerHTML = '<span class="badge out-stock">Out of Stock</span>';
+                } else {
+                    stockEl.innerHTML = '<span class="badge in-stock">In Stock</span>';
+                }
+                
+                // Pricing
+                const pricingEl = document.getElementById('modalPricing');
+                if (product.pricing.on_sale) {
+                    const discount = Math.round(((product.pricing.regular_price - product.pricing.sale_price) / product.pricing.regular_price) * 100);
+                    const savings = (product.pricing.regular_price - product.pricing.sale_price).toLocaleString();
+                    
+                    pricingEl.innerHTML = `
+                        <div class="sale-badge">SALE</div>
+                        <div class="price-group">
+                            <span class="price current-price">TSh ${product.pricing.sale_price.toLocaleString()}</span>
+                            <span class="price original-price">TSh ${product.pricing.regular_price.toLocaleString()}</span>
+                        </div>
+                        <div class="discount-info">
+                            <span class="discount-percent">${discount}% OFF</span>
+                            <span class="savings-amount">Save TSh ${savings}</span>
+                        </div>
+                    `;
+                } else {
+                    pricingEl.innerHTML = `<span class="price">TSh ${product.pricing.regular_price.toLocaleString()}</span>`;
+                }
+                
+                // Description
+                const descEl = document.getElementById('modalDescription');
+                if (product.long_description || product.short_description) {
+                    descEl.innerHTML = product.long_description || product.short_description;
+                    descEl.parentElement.style.display = 'block';
+                } else {
+                    descEl.parentElement.style.display = 'none';
+                }
+                
+                // Features
+                const featuresEl = document.getElementById('modalFeatures');
+                const featuresListEl = document.getElementById('modalFeaturesList');
+                if (product.key_features && product.key_features.length > 0) {
+                    featuresListEl.innerHTML = product.key_features.map(feature => 
+                        `<li>${feature}</li>`
+                    ).join('');
+                    featuresEl.style.display = 'block';
+                } else {
+                    featuresEl.style.display = 'none';
+                }
+                
+                // Specifications
+                const specsEl = document.getElementById('modalSpecs');
+                const specsListEl = document.getElementById('modalSpecsList');
+                if (product.specifications && product.specifications.length > 0) {
+                    specsListEl.innerHTML = product.specifications.map(spec => 
+                        `<div class="spec-item">
+                            <span class="spec-label">${spec.label}:</span>
+                            <span class="spec-value">${spec.value}</span>
+                        </div>`
+                    ).join('');
+                    specsEl.style.display = 'block';
+                } else {
+                    specsEl.style.display = 'none';
+                }
+                
+                // WhatsApp button
+                const whatsappBtn = document.getElementById('modalWhatsAppBtn');
+                const message = product.whatsapp_message || `I'm interested in ${product.title}`;
+                whatsappBtn.href = `https://wa.me/{{ site.whatsapp_phone }}?text=${encodeURIComponent(message)}`;
+            }
+        }
+        
+        // Initialize quick view
+        initializeQuickView();
+
+        // Reinitialize for dynamically added content
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1 && node.classList.contains('product-card')) {
+                            const container = node.querySelector('.image-container');
+                            if (container) {
+                                initializeImageLoading();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        observer.observe(document.getElementById('product-list'), {
+            childList: true,
+            subtree: true
+        });
+    });
+</script>
+
+{% include trust.html %}

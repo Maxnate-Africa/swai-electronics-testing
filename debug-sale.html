@@ -1,0 +1,57 @@
+---
+layout: default
+title: Debug Sale Filter
+---
+
+<h2>Sale Filter Debug</h2>
+
+<div class="debug-info">
+  <h3>All Products Sale Status:</h3>
+  {% for product in site.products %}
+  <div class="debug-product" style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+    <strong>{{ product.title }}</strong><br>
+    <em>Category:</em> {{ product.category }}<br>
+    
+    {% if product.pricing_info %}
+    <em>Pricing Structure:</em> Nested (pricing_info)<br>
+    <em>Regular Price:</em> {{ product.pricing_info.price }}<br>
+    <em>Sale Price:</em> {{ product.pricing_info.sale_price }}<br>
+    {% if product.pricing_info.sale_start %}<em>Sale Start:</em> {{ product.pricing_info.sale_start }}<br>{% endif %}
+    {% if product.pricing_info.sale_end %}<em>Sale End:</em> {{ product.pricing_info.sale_end }}<br>{% endif %}
+    {% else %}
+    <em>Pricing Structure:</em> Flat<br>
+    <em>Regular Price:</em> {{ product.price }}<br>
+    <em>Sale Price:</em> {{ product.sale_price }}<br>
+    {% if product.sale_start %}<em>Sale Start:</em> {{ product.sale_start }}<br>{% endif %}
+    {% if product.sale_end %}<em>Sale End:</em> {{ product.sale_end }}<br>{% endif %}
+    {% endif %}
+    
+    <em>Is On Sale:</em> {{ product | is_on_sale }}<br>
+    <em>Effective Price:</em> {{ product | get_effective_price }}<br>
+    <em>Formatted Price:</em> {{ product | get_effective_price | format_price }}
+  </div>
+  {% endfor %}
+</div>
+
+<div class="sale-products">
+  <h3>Products Currently On Sale:</h3>
+  {% assign sale_count = 0 %}
+  {% for product in site.products %}
+    {% assign is_sale = product | is_on_sale %}
+    {% if is_sale %}
+      {% assign sale_count = sale_count | plus: 1 %}
+    {% endif %}
+  {% endfor %}
+  <p><strong>Total Sale Items: {{ sale_count }}</strong></p>
+  
+  {% for product in site.products %}
+    {% assign is_sale = product | is_on_sale %}
+    {% if is_sale %}
+    <div style="border: 2px solid #E60000; padding: 10px; margin: 10px 0;">
+      <strong>{{ product.title }}</strong> - {{ product.category }}<br>
+      Regular: {{ product | get_product_price: 'price' | format_price }}<br>
+      Sale: {{ product | get_product_price: 'sale_price' | format_price }}
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>

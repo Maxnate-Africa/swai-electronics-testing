@@ -1,0 +1,111 @@
+{% comment %}
+Floating Offer Card: shows when an active offer exists.
+Active = published != false and within optional start/end window relative to site.time.
+Order by priority (desc) then date (desc); display the first active offer.
+Minimize/dismiss state persisted per offer key in localStorage.
+{% endcomment %}
+
+{% assign now = site.time | date: '%Y-%m-%d' %}
+{% assign brand_logo = site.offers.logo | default: '/assets/images/logo.png' %}
+{% assign raw_offers = site.offers | where_exp: 'o', 'o.published != false' %}
+{% assign sorted = raw_offers | sort: 'priority' | reverse %}
+{% capture offers_json %}[
+{% assign first_flag = true %}
+{% for o in sorted %}
+  {% assign start_date = o.start | default: o.date | date: '%Y-%m-%d' %}
+  {% assign end_date = o.end | date: '%Y-%m-%d' %}
+  {% assign has_end = o.end | default: '' | size %}
+  {% if start_date <= now and (has_end == 0 or now <= end_date) %}
+    {% unless first_flag %},{% endunless %}{
+      "key": {{ o.id | default: o.slug | jsonify }},
+      "title": {{ o.title | jsonify }},
+      "image": {{ o.image | relative_url | jsonify }},
+      "body": {{ o.content | markdownify | jsonify }},
+      "cta_text": {{ o.cta_text | default: 'Shop now' | jsonify }},
+      "cta_url": {{ o.cta_url | jsonify }},
+      "whatsapp_message": {{ o.whatsapp_message | jsonify }}
+    }
+    {% assign first_flag = false %}
+  {% endif %}
+{% endfor %}
+]{% endcapture %}
+{% assign offers_json_stripped = offers_json | strip %}
+{% if offers_json_stripped != '[]' %}
+  <aside class="offer-card" id="offer-card" aria-live="polite" aria-label="Special offers" data-offers='{{ offers_json_stripped | escape }}' data-brand-logo='{{ brand_logo | relative_url }}'>
+    <button class="offer-btn offer-close" id="offer-close" aria-label="Dismiss offer">×</button>
+    <button class="offer-btn offer-min" id="offer-min" aria-label="Minimize offer">▾</button>
+    <div class="offer-media"><img id="offer-image" src="" alt="Offer image" style="display:none;"></div>
+    <div class="offer-body">
+      <h3 class="offer-title" id="offer-title"></h3>
+      <div class="offer-text" id="offer-text"></div>
+      <div class="offer-actions" id="offer-actions"></div>
+    </div>
+    <button class="offer-pill" id="offer-pill" aria-label="Show offer" hidden>Offer</button>
+    <div class="offer-indicators" id="offer-indicators" aria-hidden="true"></div>
+  </aside>
+
+  <script>
+    (function(){
+      var root = document.getElementById('offer-card');
+      if (!root) return;
+      var phone = {{ site.whatsapp_phone | jsonify }};
+      var brandLogo = root.getAttribute('data-brand-logo');
+      var offersData; try { offersData = JSON.parse(root.getAttribute('data-offers')); } catch(e){ offersData=[]; }
+      function getQueryParam(name){ try { var params=new URLSearchParams(window.location.search); return params.get(name); } catch(e){ return null; } }
+      var offersParam = getQueryParam('offers');
+      var ignoreDismiss = (offersParam === 'show' || offersParam === 'force');
+      if (!offersData.length) { root.style.display='none'; return; }
+      var btnClose = document.getElementById('offer-close');
+      var btnMin = document.getElementById('offer-min');
+      var pill = document.getElementById('offer-pill');
+      var titleEl = document.getElementById('offer-title');
+      var textEl = document.getElementById('offer-text');
+      var imgEl = document.getElementById('offer-image');
+      var actEl = document.getElementById('offer-actions');
+      var indicatorsEl = document.getElementById('offer-indicators');
+      var idx = 0;
+      var rotateMs = 12000;
+      function isDismissed(key){ if (ignoreDismiss) return false; try { return localStorage.getItem('offer:dis:'+key)==='1'; } catch(e){ return false; } }
+      function isMinimized(){ return root.classList.contains('is-min'); }
+      function setMinimized(min){ if (min){ root.classList.add('is-min'); pill.hidden=false; } else { root.classList.remove('is-min'); pill.hidden=true; } try { localStorage.setItem('offer:min', min?'1':'0'); } catch(e){} }
+      function loadMin(){ try { if (localStorage.getItem('offer:min')==='1') setMinimized(true); } catch(e){} }
+      function buildIndicators(){ if (offersData.length<2){ indicatorsEl.style.display='none'; return; } indicatorsEl.innerHTML=offersData.map(function(o,i){ return '<span class="ind" data-i="'+i+'"></span>'; }).join(''); }
+      function updateIndicators(){ var nodes=indicatorsEl.querySelectorAll('.ind'); nodes.forEach(function(n){ n.classList.toggle('active', parseInt(n.getAttribute('data-i'))===idx); }); }
+      function nextIndex(start){ var len=offersData.length, attempts=0, i=start; while(attempts<len){ var offer=offersData[i]; if(!isDismissed(offer.key)) return i; i=(i+1)%len; attempts++; } return -1; }
+      function render(){
+        idx=nextIndex(idx);
+        if(idx===-1){ root.style.display='none'; return; }
+        var offer=offersData[idx];
+        titleEl.textContent=offer.title;
+        textEl.innerHTML=offer.body||'';
+        if(offer.image && offer.image !== brandLogo){
+          imgEl.src=offer.image; imgEl.alt=offer.title; imgEl.style.display='block';
+          if(offer.image.includes('offers-logo.png')) imgEl.classList.add('offers-logo');
+        } else {
+          imgEl.style.display='none';
+        }
+        actEl.innerHTML='';
+        var msg=offer.whatsapp_message || ('Hi, I want to claim the offer: '+offer.title);
+        if(phone){
+          var a=document.createElement('a'); a.href='https://wa.me/'+phone+'?text='+encodeURIComponent(msg); a.target='_blank'; a.rel='noopener'; a.className='offer-cta offer-claim'; a.textContent='Claim on WhatsApp'; actEl.appendChild(a);
+        } else if (offer.cta_url){
+          var b=document.createElement('a'); b.href=offer.cta_url; b.target='_blank'; b.rel='noopener'; b.className='offer-cta'; b.textContent=offer.cta_text||'Shop now'; actEl.appendChild(b);
+        }
+        updateIndicators();
+      }
+      function rotate(){ if(offersData.length<2) return; if(isMinimized()) return; idx=(idx+1)%offersData.length; render(); }
+      if (offersParam === 'reset'){
+        try {
+          offersData.forEach(function(o){ localStorage.removeItem('offer:dis:'+o.key); });
+          localStorage.removeItem('offer:min');
+        } catch(e){}
+      }
+      buildIndicators(); render(); loadMin();
+      setTimeout(function(){ root.classList.add('show'); }, 100);
+      btnClose && btnClose.addEventListener('click', function(){ var offer=offersData[idx]; try { localStorage.setItem('offer:dis:'+offer.key,'1'); } catch(e){} idx=(idx+1)%offersData.length; render(); });
+      btnMin && btnMin.addEventListener('click', function(){ setMinimized(!isMinimized()); });
+      pill && pill.addEventListener('click', function(){ setMinimized(false); });
+      setInterval(rotate, rotateMs);
+    })();
+  </script>
+{% endif %}

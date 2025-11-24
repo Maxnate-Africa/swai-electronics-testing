@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include head.html %}
+<body>
+
+    <div class="container">
+        <!-- LEFT SIDEBAR (The Brand Anchor) -->
+        {% include sidebar.html %}
+
+        <!-- RIGHT CONTENT (The Product Canvas) -->
+        <main class="content">
+            <header class="mobile-header">
+                <a href="/">
+                    <img src="/assets/images/logo.png" alt="Swai Electronics" class="mobile-logo">
+                </a>
+            </header>
+
+            {{ content }}
+        </main>
+    </div>
+
+    <script>
+        if (window.netlifyIdentity) {
+            window.netlifyIdentity.on("init", user => {
+            if (!user) {
+                window.netlifyIdentity.on("login", () => {
+                document.location.href = "/cms-admin/";
+                });
+            }
+            });
+        }
+    </script>
+    {% include consent_analytics.html %}
+    {% include offer_card.html %}
+</body>
+</html>
