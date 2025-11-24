@@ -59,6 +59,7 @@ exclude:
   - deploy.ps1
   - .github/
   - README.md
+  - CNAME
   # Do NOT exclude Markdown site content
   # - "*.md"  # removed: breaks collections/pages
   # CNAME only if using a custom domain (not needed now)
