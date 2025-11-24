@@ -56,6 +56,7 @@ assets/images/products/*-600.png
 assets/images/products/*-300.webp
 assets/images/products/*-600.webp
 assets/images/products/*.webp
+assets/images/products/variants-manifest.json
 
 # Environment variables
 .env

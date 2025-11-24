@@ -30,7 +30,7 @@ jobs:
       - name: Install Pillow
         run: python -m pip install --upgrade pip && pip install Pillow
       - name: Generate responsive image variants
-        run: python generate_images.py
+        run: python generate_images.py --widths 300,600,900 --webp-quality-original 87 --webp-quality 80 --png-compress-level 6
         
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
