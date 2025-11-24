@@ -6,7 +6,7 @@ Minimize/dismiss state persisted per offer key in localStorage.
 {% endcomment %}
 
 {% assign now = site.time | date: '%Y-%m-%d' %}
-{% assign brand_logo = site.offers.logo | default: '/assets/images/logo.png' %}
+{% assign brand_logo = site.offers.logo | default: '/assets/images/logo.svg' %}
 {% assign raw_offers = site.offers | where_exp: 'o', 'o.published != false' %}
 {% assign sorted = raw_offers | sort: 'priority' | reverse %}
 {% capture offers_json %}[
@@ -80,7 +80,7 @@ Minimize/dismiss state persisted per offer key in localStorage.
         textEl.innerHTML=offer.body||'';
         if(offer.image && offer.image !== brandLogo){
           imgEl.src=offer.image; imgEl.alt=offer.title; imgEl.style.display='block';
-          if(offer.image.includes('offers-logo.png')) imgEl.classList.add('offers-logo');
+          if(offer.image.includes('offers-logo.svg') || offer.image.includes('offers-logo.png')) imgEl.classList.add('offers-logo');
         } else {
           imgEl.style.display='none';
         }
