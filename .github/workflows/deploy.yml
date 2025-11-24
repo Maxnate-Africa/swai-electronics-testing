@@ -3,9 +3,18 @@ name: Deploy to GitHub Pages and Netlify
 on:
   push:
     branches: [ master, main ]
-  pull_request:
-    branches: [ master, main ]
   workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -21,42 +30,63 @@ jobs:
         ruby-version: '3.1'
         bundler-cache: true
         
-    - name: Setup Node.js
+    - name: Setup Node.js (for Netlify CLI)
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+        
     - name: Install dependencies
-      run: |
-        bundle install
-        npm install -g netlify-cli
+      run: bundle install
         
     - name: Build Jekyll site
       run: bundle exec jekyll build
       env:
         JEKYLL_ENV: production
         
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    - name: Upload GitHub Pages artifact
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./_site
-        exclude_assets: 'cms-admin/**'
+        path: ./_site
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
         
     - name: Prepare CMS admin for Netlify
+      if: github.ref == 'refs/heads/master'
       run: |
         mkdir -p netlify-deploy
-        cp -r _site/cms-admin/* netlify-deploy/
-        # Copy necessary assets for CMS
-        mkdir -p netlify-deploy/assets
-        cp -r _site/assets/css netlify-deploy/assets/ 2>/dev/null || true
-        cp -r _site/assets/images netlify-deploy/assets/ 2>/dev/null || true
+        if [ -d "_site/cms-admin" ]; then
+          cp -r _site/cms-admin/* netlify-deploy/
+          # Copy necessary assets for CMS
+          mkdir -p netlify-deploy/assets
+          [ -d "_site/assets/css" ] && cp -r _site/assets/css netlify-deploy/assets/ || true
+          [ -d "_site/assets/images" ] && cp -r _site/assets/images netlify-deploy/assets/ || true
+          echo "CMS admin files prepared for Netlify deployment"
+        else
+          echo "No CMS admin directory found"
+        fi
         
     - name: Deploy CMS to Netlify
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/master' && env.NETLIFY_AUTH_TOKEN != '' && env.NETLIFY_SITE_ID != ''
       run: |
+        npm install -g netlify-cli
         netlify deploy --prod --dir=netlify-deploy --site=${{ secrets.NETLIFY_SITE_ID }} --auth=${{ secrets.NETLIFY_AUTH_TOKEN }}
+        echo "CMS deployed to Netlify successfully"
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
         NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        
+    - name: Netlify deployment status
+      if: github.ref == 'refs/heads/master'
+      run: |
+        if [ -z "${{ secrets.NETLIFY_AUTH_TOKEN }}" ] || [ -z "${{ secrets.NETLIFY_SITE_ID }}" ]; then
+          echo "⚠️  Netlify deployment skipped: Missing NETLIFY_AUTH_TOKEN or NETLIFY_SITE_ID secrets"
+          echo "   Add these secrets in Repository Settings > Secrets and variables > Actions"
+          echo "   CMS admin files are prepared in netlify-deploy/ directory"
+        else
+          echo "✅ Netlify deployment completed"
+        fi
