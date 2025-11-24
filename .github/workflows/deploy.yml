@@ -28,11 +28,18 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
-          bundler-cache: true
+          bundler-cache: false
           
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
+      - name: Prepare bundle for Linux platform
+        run: |
+          ruby -v
+          bundle -v
+          bundle lock --add-platform x86_64-linux
+      - name: Install gems
+        run: bundle install --jobs 4
         
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"

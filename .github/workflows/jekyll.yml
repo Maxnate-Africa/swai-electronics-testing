@@ -38,8 +38,15 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2' # Match Bundler 2.7.x requirement
-          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: false # we'll run bundle to fix platforms first
           cache-version: 0 # Increment this number if you need to re-download cached gems
+      - name: Prepare bundle for Linux platform
+        run: |
+          ruby -v
+          bundle -v
+          bundle lock --add-platform x86_64-linux
+      - name: Install gems
+        run: bundle install --jobs 4
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
