@@ -1,6 +1,6 @@
 ---
 title: LG 55 OLED
-price: 3,200,000
+price: 3200000
 category: televisions
 image: /assets/images/products/lg-55-oled.png
 whatsapp_message: "I'm interested in LG 55 OLED"

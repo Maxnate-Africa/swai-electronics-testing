@@ -1,6 +1,6 @@
 ---
 title: Apple AirPods Pro
-price: 350,000
+price: 350000
 category: audio
 image: /assets/images/products/apple-airpods-pro.png
 whatsapp_message: "I'm interested in Apple AirPods Pro"

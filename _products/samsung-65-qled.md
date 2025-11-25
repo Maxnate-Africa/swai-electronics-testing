@@ -1,6 +1,6 @@
 ---
 title: Samsung 65 QLED
-price: 2,500,000
+price: 2500000
 category: televisions
 image: /assets/images/products/samsung-65-qled.png
 whatsapp_message: "I'm interested in Samsung 65 QLED"

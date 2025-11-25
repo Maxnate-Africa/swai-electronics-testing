@@ -1,6 +1,6 @@
 ---
 title: Sony 50" BRAVIA
-price: 1,800,000
+price: 1800000
 category: televisions
 image: /assets/images/products/sony-50-bravia.png
 whatsapp_message: "I'm interested in Sony 50 BRAVIA"

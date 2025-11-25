@@ -1,6 +1,6 @@
 ---
 title: Whirlpool Refrigerator
-price: 950,000
+price: 950000
 category: home-appliances
 image: /assets/images/products/whirlpool-fridge.png
 whatsapp_message: "I'm interested in Whirlpool Refrigerator"

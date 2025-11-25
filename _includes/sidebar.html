@@ -8,11 +8,20 @@
     <hr class="sidebar-separator">
     
     <nav class="nav-links">
-        <a href="#" class="filter-link active" data-filter="all">All Products</a>
-        <a href="#" class="filter-link sale-filter" data-filter="on-sale">🏷️ Sale Items</a>
-        <a href="#" class="filter-link" data-filter="televisions">Televisions</a>
-        <a href="#" class="filter-link" data-filter="audio">Audio</a>
-        <a href="#" class="filter-link" data-filter="home-appliances">Home Appliances</a>
+        {% assign filters = site.data.filters %}
+        {% if filters.show_all_link != false %}
+        <a href="#" class="filter-link active" data-filter="all">{{ filters.all_label | default: 'All Products' }}</a>
+        {% endif %}
+        {% if filters.show_sale_filter %}
+        <a href="#" class="filter-link sale-filter" data-filter="on-sale">{{ filters.sale_label | default: '🏷️ Sale Items' }}</a>
+        {% endif %}
+        {% assign cats = filters.categories %}
+        {% if cats == nil or cats.size == 0 %}
+          {% assign cats = site.products | map: 'category' | uniq %}
+        {% endif %}
+        {% for cat in cats %}
+        <a href="#" class="filter-link" data-filter="{{ cat }}">{{ cat | replace: '-', ' ' | capitalize }}</a>
+        {% endfor %}
     </nav>
 
     <div class="sidebar-footer">

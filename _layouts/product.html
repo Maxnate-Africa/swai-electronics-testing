@@ -31,7 +31,27 @@ layout: default
        {% endif %}
      </h1>
      {% if page.price %}
-     <p class="price">TSh {{ page.price | format_price }}</p>
+       {% if page.sale_price and page.price and page.sale_price < page.price and page | is_on_sale %}
+       {% assign discount_pct = page.price | calculate_discount: page.sale_price %}
+       {% assign savings_txt = page.price | format_savings: page.sale_price %}
+       <div class="price-block sale-active">
+         <p class="price current">{{ page.sale_price | format_price }}</p>
+         <p class="price original"><s>{{ page.price | format_price }}</s></p>
+         <p class="price-meta">
+           <span class="discount">{{ discount_pct }}% OFF</span>
+           <span class="savings">{{ savings_txt }}</span>
+         </p>
+          {% if page.sale_start or page.sale_end %}
+          <p class="sale-dates">
+            {% if page.sale_start %}Starts: {{ page.sale_start | date: '%-d %b %Y' }}{% endif %}
+            {% if page.sale_start and page.sale_end %} · {% endif %}
+            {% if page.sale_end %}Ends: {{ page.sale_end | date: '%-d %b %Y' }}{% endif %}
+          </p>
+          {% endif %}
+       </div>
+       {% else %}
+       <p class="price">{{ page.price | format_price }}</p>
+       {% endif %}
      {% endif %}
 
      {% if page.short_description %}
@@ -112,7 +132,13 @@ layout: default
       <div class="related-info">
         <div class="related-title">{{ r.title }}</div>
         <div class="related-meta">
-          <span class="price">TSh {{ r.price | format_price }}</span>
+          {% if r.sale_price and r.price and r.sale_price < r.price and r | is_on_sale %}
+            <span class="price sale">{{ r.sale_price | format_price }}</span>
+            <span class="price original"><s>{{ r.price | format_price }}</s></span>
+            <span class="price discount">{{ r.price | calculate_discount: r.sale_price }}% OFF</span>
+          {% else %}
+            <span class="price">{{ r.price | format_price }}</span>
+          {% endif %}
         </div>
       </div>
     </a>

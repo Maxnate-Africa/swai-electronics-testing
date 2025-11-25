@@ -1,6 +1,6 @@
 ---
 title: Bose QuietComfort 45
-price: 750,000
+price: 750000
 category: audio
 image: /assets/images/products/bose-qc45.png
 whatsapp_message: "I'm interested in Bose QuietComfort 45"

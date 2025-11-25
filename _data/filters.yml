@@ -1,0 +1,10 @@
+show_all_link: true
+all_label: "All Products"
+show_sale_filter: true
+sale_label: "🏷️ Sale Items"
+# Optional override list; if empty, categories derived from products
+categories:
+  - televisions
+  - audio
+  - home-appliances
+notes: "Edit labels and category order via CMS. Leave categories empty to auto-derive from product front matter."

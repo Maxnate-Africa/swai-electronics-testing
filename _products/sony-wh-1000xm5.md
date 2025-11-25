@@ -1,6 +1,6 @@
 ---
 title: Sony WH-1000XM5
-price: 480,000
+price: 480000
 category: audio
 image: /assets/images/products/sony-wh-1000xm5.png
 whatsapp_message: "I'm interested in Sony WH-1000XM5"

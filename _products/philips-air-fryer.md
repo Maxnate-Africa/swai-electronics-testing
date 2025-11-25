@@ -1,6 +1,6 @@
 ---
 title: Philips Air Fryer
-price: 280,000
+price: 280000
 category: home-appliances
 image: /assets/images/products/philips-air-fryer.png
 whatsapp_message: "I'm interested in Philips Air Fryer"

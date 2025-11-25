@@ -1,6 +1,6 @@
 ---
 title: Samsung 55" UHD 4K
-price: 1,200,000
+price: 1200000
 category: televisions
 image: /assets/images/products/samsung-55-uhd.png
 whatsapp_message: "I'm interested in Samsung 55 UHD"

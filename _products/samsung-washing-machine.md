@@ -1,6 +1,6 @@
 ---
 title: Samsung Washing Machine
-price: 1,200,000
+price: 1200000
 category: home-appliances
 image: /assets/images/products/samsung-washing-machine.png
 whatsapp_message: "I'm interested in Samsung Washing Machine"

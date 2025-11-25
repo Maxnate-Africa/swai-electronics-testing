@@ -1,6 +1,6 @@
 ---
 title: Samsung Soundbar Q600B
-price: 850,000
+price: 850000
 category: audio
 image: /assets/images/products/samsung-soundbar-q600b.png
 whatsapp_message: "I'm interested in Samsung Soundbar Q600B"

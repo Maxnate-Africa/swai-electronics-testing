@@ -4,20 +4,32 @@ const ProductPreview = createClass({
     const entry = this.props.entry;
     const title = entry.getIn(['data', 'title']);
     
-    // Flattened pricing structure
-    const price = entry.getIn(['data', 'price']);
-    const salePrice = entry.getIn(['data', 'sale_price']);
+    // Flattened pricing structure (raw values)
+    const priceRaw = entry.getIn(['data', 'price']);
+    const salePriceRaw = entry.getIn(['data', 'sale_price']);
     const saleStart = entry.getIn(['data', 'sale_start']);
     const saleEnd = entry.getIn(['data', 'sale_end']);
     
-    // Check if sale is currently active based on dates
+    // Sanitize numeric input (remove commas, spaces, currency) and parse as float
+    const parseAmount = (val) => {
+      if (val === undefined || val === null) return null;
+      const cleaned = val.toString().replace(/[^0-9.]/g, '').replace(/\.(?=.*\.)/, ''); // remove all but first dot
+      if (!cleaned) return null;
+      const num = parseFloat(cleaned);
+      return Number.isFinite(num) ? num : null;
+    };
+
+    const price = parseAmount(priceRaw);
+    const salePrice = parseAmount(salePriceRaw);
+
+    // Determine if sale is valid and active
+    const validSale = salePrice !== null && price !== null && salePrice < price;
     const now = new Date();
-    let saleActive = salePrice && price && salePrice < price;
-    if (saleActive && saleStart) {
-      saleActive = saleActive && new Date(saleStart) <= now;
-    }
-    if (saleActive && saleEnd) {
-      saleActive = saleActive && new Date(saleEnd) >= now;
+    let saleActive = false;
+    if (validSale) {
+      saleActive = true;
+      if (saleStart) saleActive = saleActive && new Date(saleStart) <= now;
+      if (saleEnd) saleActive = saleActive && new Date(saleEnd) >= now;
     }
     const category = entry.getIn(['data', 'category']);
     const stock = entry.getIn(['data', 'stock'], 1);
@@ -26,8 +38,8 @@ const ProductPreview = createClass({
     
     // Use calculated sale status
     const isOnSale = saleActive;
-    const discount = isOnSale ? Math.round(((price - salePrice) / price) * 100) : 0;
-    const savings = isOnSale ? price - salePrice : 0;
+    const discount = isOnSale ? Math.max(0, Math.round(((price - salePrice) / price) * 100)) : 0;
+    const savings = isOnSale ? Math.max(0, (price - salePrice)) : 0;
     
     // Format currency
     const formatPrice = (amount) => {
@@ -50,8 +62,8 @@ const ProductPreview = createClass({
           isOnSale ? [
             h('div', {className: 'sale-badge'}, 'SALE'),
             h('div', {className: 'price-group'}, [
-              h('span', {className: 'price current-price'}, formatPrice(salePrice)),
-              h('span', {className: 'price original-price'}, formatPrice(price))
+              h('span', {className: 'price current-price'}, formatPrice(salePriceRaw || salePrice)),
+              h('span', {className: 'price original-price'}, formatPrice(priceRaw || price))
             ]),
             h('div', {className: 'discount-info'}, [
               h('span', {className: 'discount-percent'}, `${discount}% OFF`),
@@ -62,8 +74,9 @@ const ProductPreview = createClass({
               saleEnd ? ` | Ends: ${new Date(saleEnd).toLocaleDateString()}` : ''
             ].filter(Boolean).join('')) : null
           ] : [
-            h('span', {className: 'price'}, formatPrice(price)),
-            (salePrice && !saleActive) ? h('div', {className: 'sale-inactive'}, 'Sale Not Active') : null
+            h('span', {className: 'price'}, formatPrice(priceRaw || price)),
+            (salePriceRaw && !validSale) ? h('div', {className: 'sale-inactive'}, 'Invalid sale price (must be lower)') : null,
+            (validSale && !saleActive) ? h('div', {className: 'sale-inactive'}, 'Sale Not Active') : null
           ]
         ]),
         description ? h('p', {className: 'description'}, description) : null
