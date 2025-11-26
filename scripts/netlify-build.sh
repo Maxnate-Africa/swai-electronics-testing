@@ -2,10 +2,11 @@
 set -euo pipefail
 
 echo "[Netlify] Installing Ruby gems with Bundler"
-bundle install --path vendor/bundle
+gem install bundler -v 2.7.2
+bundle _2.7.2_ install --path vendor/bundle
 
 echo "[Netlify] Building Jekyll site"
-JEKYLL_ENV=production bundle exec jekyll build
+JEKYLL_ENV=production bundle _2.7.2_ exec jekyll build
 
 echo "[Netlify] Preparing admin publish directory"
 rm -rf netlify-deploy

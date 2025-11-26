@@ -22,12 +22,12 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.1.6'
+          ruby-version: '3.4.7'
           bundler-cache: false
 
       - name: Install Bundler
         run: |
-          gem install bundler -v 2.4.22
+          gem install bundler -v 2.7.2
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -36,7 +36,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          bundle install
+          bundle _2.7.2_ install
       
       - name: Build Jekyll site
         run: |
