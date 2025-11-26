@@ -28,7 +28,7 @@ a {
 /* SIDEBAR (RED) */
 .sidebar {
     width: 25%;
-    background-color: #E60000; /* SWAI RED */
+    background-color: #000000; /* SWAI RED */
     color: white;
     padding: 30px;
     position: fixed;
