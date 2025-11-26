@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
   <title>Swai Electronics CMS</title>
+  
+  <!-- Netlify Identity Widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  
   <style>
     body {
       margin: 0;
@@ -50,12 +54,26 @@
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
   
   <script>
+    // Check authentication on load
+    if (window.netlifyIdentity) {
+      netlifyIdentity.on('init', user => {
+        if (!user) {
+          // Not authenticated, redirect to login
+          window.location.href = 'index.html';
+        }
+      });
+      
+      netlifyIdentity.on('logout', () => {
+        window.location.href = 'index.html';
+      });
+    }
+    
     // Handle logout
     function handleLogout() {
-      if (window.parent && window.parent.adminLogout) {
-        window.parent.adminLogout();
+      if (window.netlifyIdentity) {
+        netlifyIdentity.logout();
       } else {
-        alert('Unable to logout. Please refresh the page.');
+        window.location.href = 'index.html';
       }
     }
     

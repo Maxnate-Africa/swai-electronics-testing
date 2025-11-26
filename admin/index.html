@@ -8,24 +8,6 @@
     
     <!-- Netlify Identity Widget -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    
-    <style>
-        /* Decap CMS iframe container */
-        #decap-cms-frame {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-            z-index: 9999;
-        }
-        
-        #decap-cms-frame.active {
-            display: block;
-        }
-    </style>
 </head>
 <body>
     
@@ -63,13 +45,9 @@
         </div>
     </div>
     
-    <!-- Decap CMS will load here after authentication -->
-    <iframe id="decap-cms-frame"></iframe>
-    
     <script>
         const loginScreen = document.getElementById('login-screen');
         const loginForm = document.getElementById('login-form');
-        const cmsFrame = document.getElementById('decap-cms-frame');
         const togglePassword = document.getElementById('toggle-password');
         const passwordInput = document.getElementById('password');
         
@@ -112,7 +90,7 @@
             // Listen for logout events
             netlifyIdentity.on('logout', () => {
                 console.log('⚠️ User logged out');
-                location.reload();
+                location.href = '/admin/';
             });
         }
         
@@ -130,21 +108,9 @@
         
         function loadDecapCMS() {
             console.log('🚀 Loading Decap CMS...');
-            
-            // Hide login screen
-            loginScreen.classList.remove('active');
-            
-            // Load Decap CMS
-            cmsFrame.src = 'cms.html';
-            cmsFrame.classList.add('active');
+            // Redirect to the CMS page
+            window.location.href = 'cms.html';
         }
-        
-        // Global logout function for iframe
-        window.adminLogout = function() {
-            if (window.netlifyIdentity) {
-                netlifyIdentity.logout();
-            }
-        };
     </script>
 
 </body>
