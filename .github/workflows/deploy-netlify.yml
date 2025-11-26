@@ -24,19 +24,11 @@ jobs:
         with:
           ruby-version: '3.4.7'
           bundler-cache: false
+          cache-version: 0
 
-      - name: Install Bundler
-        run: |
-          gem install bundler -v 2.7.2
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      
       - name: Install dependencies
         run: |
-          bundle _2.7.2_ install
+          bundle install
       
       - name: Build Jekyll site
         run: |
