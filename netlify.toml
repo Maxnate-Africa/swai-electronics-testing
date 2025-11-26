@@ -1,7 +1,7 @@
 [build]
-  # Build and publish the full Jekyll site
-  publish = "_site"
-  command = "bash scripts/netlify-build.sh"
+  # Publish only the CMS admin interface
+  publish = "admin"
+  command = "echo 'Deploying CMS only - no build needed'"
 
 [build.environment]
   NODE_VERSION = "18"
