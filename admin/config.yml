@@ -1,0 +1,72 @@
+backend:
+  name: git-gateway
+  branch: master
+
+# Publish mode
+publish_mode: editorial_workflow
+
+# Media management
+media_folder: "assets/images"
+public_folder: "/assets/images"
+
+# Collections
+collections:
+  # Products Collection
+  - name: "products"
+    label: "Products"
+    folder: "_products"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Layout", name: "layout", widget: "hidden", default: "product"}
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Price", name: "price", widget: "number", value_type: "float"}
+      - {label: "Sale Price", name: "sale_price", widget: "number", value_type: "float", required: false}
+      - {label: "On Sale", name: "on_sale", widget: "boolean", default: false, required: false}
+      - {label: "Discount Percentage", name: "discount_percentage", widget: "number", value_type: "int", required: false}
+      - {label: "Category", name: "category", widget: "select", options: ["Electronics", "Appliances", "Audio", "Video", "Smart Devices", "Accessories"]}
+      - {label: "Brand", name: "brand", widget: "string", required: false}
+      - {label: "Model", name: "model", widget: "string", required: false}
+      - {label: "Image", name: "image", widget: "image"}
+      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Features", name: "features", widget: "list", required: false}
+      - {label: "Specifications", name: "specifications", widget: "list", fields: [
+          {label: "Key", name: "key", widget: "string"},
+          {label: "Value", name: "value", widget: "string"}
+        ], required: false}
+      - {label: "In Stock", name: "in_stock", widget: "boolean", default: true}
+      - {label: "Featured", name: "featured", widget: "boolean", default: false}
+      - {label: "Date", name: "date", widget: "datetime"}
+
+  # Special Offers Collection
+  - name: "offers"
+    label: "Special Offers"
+    folder: "_offers"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Description", name: "description", widget: "text"}
+      - {label: "Discount", name: "discount", widget: "string", hint: "e.g., '20% OFF' or 'Buy 1 Get 1'"}
+      - {label: "Start Date", name: "start_date", widget: "datetime"}
+      - {label: "End Date", name: "end_date", widget: "datetime"}
+      - {label: "Image", name: "image", widget: "image", required: false}
+      - {label: "Active", name: "active", widget: "boolean", default: true}
+      - {label: "Priority", name: "priority", widget: "select", options: ["low", "medium", "high"], default: "medium"}
+
+  # Site Settings
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - label: "Configuration"
+        name: "config"
+        file: "_config.yml"
+        fields:
+          - {label: "Site Title", name: "title", widget: "string"}
+          - {label: "Email", name: "email", widget: "string"}
+          - {label: "Description", name: "description", widget: "text"}
+          - {label: "Base URL", name: "baseurl", widget: "string"}
+          - {label: "URL", name: "url", widget: "string"}
+          - {label: "Google Analytics ID", name: "google_analytics_id", widget: "string", required: false}
+          - {label: "Meta Pixel ID", name: "meta_pixel_id", widget: "string", required: false}
+          - {label: "WhatsApp Phone", name: "whatsapp_phone", widget: "string"}

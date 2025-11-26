@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swai Electronics - Admin</title>
+    <link rel="stylesheet" href="../new cms admin/css/admin.css">
+    
+    <!-- Netlify Identity Widget -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+    
+    <style>
+        /* Decap CMS iframe container */
+        #decap-cms-frame {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 9999;
+        }
+        
+        #decap-cms-frame.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Your Custom Login Screen -->
+    <div id="login-screen" class="login-screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <img class="brand-logo" src="../new cms admin/assets/svg/maxnate-logo-teal.svg" alt="MAXNATE Logo" onerror="this.style.display='none'">
+            </div>
+            <form id="login-form" class="login-form">
+                <div class="form-group">
+                    <label for="username">Email</label>
+                    <input type="email" id="username" name="username" required placeholder="admin@maxnate.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" required placeholder="Enter password" autocomplete="current-password">
+                        <button type="button" id="toggle-password" class="toggle-password" aria-label="Show password" aria-pressed="false" title="Show password">
+                            <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            <svg class="icon-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a21.77 21.77 0 0 1 5.06-6.94"></path>
+                                <path d="M1 1l22 22"></path>
+                                <path d="M10.58 10.58a2 2 0 1 0 2.83 2.83"></path>
+                                <path d="M9.88 5.46A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.77 21.77 0 0 1-3.84 5.16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Login to Dashboard</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Decap CMS will load here after authentication -->
+    <iframe id="decap-cms-frame"></iframe>
+    
+    <script>
+        const loginScreen = document.getElementById('login-screen');
+        const loginForm = document.getElementById('login-form');
+        const cmsFrame = document.getElementById('decap-cms-frame');
+        const togglePassword = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        
+        // Password toggle functionality
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', () => {
+                const isHidden = passwordInput.type === 'password';
+                passwordInput.type = isHidden ? 'text' : 'password';
+                togglePassword.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+                togglePassword.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+                togglePassword.title = isHidden ? 'Hide password' : 'Show password';
+                const eye = togglePassword.querySelector('.icon-eye');
+                const eyeOff = togglePassword.querySelector('.icon-eye-off');
+                if (eye && eyeOff) {
+                    eye.style.display = isHidden ? 'none' : '';
+                    eyeOff.style.display = isHidden ? '' : 'none';
+                }
+            });
+        }
+        
+        // Initialize Netlify Identity
+        if (window.netlifyIdentity) {
+            console.log('✅ Netlify Identity initialized');
+            
+            // Check if user is already logged in
+            netlifyIdentity.on('init', user => {
+                if (user) {
+                    console.log('✅ User already authenticated:', user.email);
+                    loadDecapCMS();
+                }
+            });
+            
+            // Listen for login events
+            netlifyIdentity.on('login', user => {
+                console.log('✅ User logged in:', user.email);
+                netlifyIdentity.close();
+                loadDecapCMS();
+            });
+            
+            // Listen for logout events
+            netlifyIdentity.on('logout', () => {
+                console.log('⚠️ User logged out');
+                location.reload();
+            });
+        }
+        
+        // Handle form submission - trigger Netlify Identity
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (window.netlifyIdentity) {
+                // Open Netlify Identity modal
+                netlifyIdentity.open('login');
+            } else {
+                alert('Authentication system not available. Please check your configuration.');
+            }
+        });
+        
+        function loadDecapCMS() {
+            console.log('🚀 Loading Decap CMS...');
+            
+            // Hide login screen
+            loginScreen.classList.remove('active');
+            
+            // Load Decap CMS
+            cmsFrame.src = 'cms.html';
+            cmsFrame.classList.add('active');
+        }
+        
+        // Global logout function for iframe
+        window.adminLogout = function() {
+            if (window.netlifyIdentity) {
+                netlifyIdentity.logout();
+            }
+        };
+    </script>
+
+</body>
+</html>

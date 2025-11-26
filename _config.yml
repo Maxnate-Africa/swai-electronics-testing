@@ -38,6 +38,11 @@ collections:
   offers:
     output: false
 
+# Include admin and custom CMS folders in build
+include:
+  - admin
+  - new cms admin
+
 defaults:
   - scope:
       path: ""

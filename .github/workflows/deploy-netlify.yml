@@ -1,0 +1,82 @@
+name: Deploy to Netlify
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.2'
+          bundler-cache: true
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: |
+          bundle install
+      
+      - name: Build Jekyll site
+        run: |
+          JEKYLL_ENV=production bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+      
+      - name: Prepare deployment directory
+        run: |
+          mkdir -p netlify-deploy
+          
+          # Copy admin interface
+          if [ -d "_site/admin" ]; then
+            cp -R _site/admin/* netlify-deploy/
+          fi
+          
+          # Copy custom CMS admin assets
+          if [ -d "_site/new cms admin" ]; then
+            mkdir -p "netlify-deploy/new cms admin"
+            cp -R "_site/new cms admin"/* "netlify-deploy/new cms admin/"
+          elif [ -d "new cms admin" ]; then
+            mkdir -p "netlify-deploy/new cms admin"
+            cp -R "new cms admin"/* "netlify-deploy/new cms admin/"
+          fi
+          
+          # Copy assets
+          mkdir -p netlify-deploy/assets
+          [ -d "_site/assets/css" ] && cp -R _site/assets/css netlify-deploy/assets/ || true
+          [ -d "_site/assets/images" ] && cp -R _site/assets/images netlify-deploy/assets/ || true
+          
+          echo "Deployment directory contents:"
+          ls -la netlify-deploy
+      
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: './netlify-deploy'
+          production-branch: master
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions - ${{ github.event.head_commit.message }}"
+          enable-pull-request-comment: true
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 5
