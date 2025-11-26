@@ -22,6 +22,33 @@ collections:
     folder: "_products"
     create: true
     slug: "{{slug}}"
+    summary: "{{title}} · TSh {{price}}{% if sale_price %} → SALE: TSh {{sale_price}}{% endif %} · {{category}}{% if brand %} · {{brand}}{% endif %}"
+    search_fields: ["title", "brand", "category", "short_description", "long_description"]
+    sortable_fields: ["title", "price", "sale_price", "category", "commit_date"]
+    view_filters:
+      - label: "In Stock"
+        field: "stock"
+        pattern: "1"
+      - label: "Out of Stock"
+        field: "stock"
+        pattern: "0"
+      - label: "Has Sale Price"
+        field: "sale_price"
+        pattern: "[1-9]\\d*"
+      - label: "Televisions"
+        field: "category"
+        pattern: "^televisions$"
+      - label: "Audio"
+        field: "category"
+        pattern: "^audio$"
+      - label: "Home Appliances"
+        field: "category"
+        pattern: "^home-appliances$"
+    view_groups:
+      - label: "Category"
+        field: "category"
+      - label: "Stock"
+        field: "stock"
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Brand", name: "brand", widget: "string", required: false }
@@ -68,6 +95,27 @@ collections:
     folder: "_offers"
     create: true
     slug: "{{slug}}"
+    summary: "{{title}}{% if sale_price %} · SALE: TSh {{sale_price}}{% endif %}{% if price %} · Reg: TSh {{price}}{% endif %} · Pri: {{priority}}"
+    search_fields: ["title", "cta_text", "cta_url", "tags"]
+    sortable_fields: ["title", "price", "sale_price", "priority", "commit_date"]
+    view_filters:
+      - label: "Published"
+        field: "published"
+        pattern: "true"
+      - label: "Unpublished"
+        field: "published"
+        pattern: "false"
+      - label: "Active (has dates or image)"
+        field: "image"
+        pattern: ".+"
+      - label: "Has Sale Price"
+        field: "sale_price"
+        pattern: "[1-9]\\d*"
+    view_groups:
+      - label: "Published"
+        field: "published"
+      - label: "Priority"
+        field: "priority"
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "ID (optional)", name: "id", widget: "string", required: false, hint: "Used for client-side persistence; defaults to slug" }
