@@ -2,8 +2,8 @@ title: Swai Electronics
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
   Premium Quality Electronics in Mwanza.
-baseurl: "/swai-electronics" # the subpath of your site, e.g. /blog
-url: "https://maxnate-africa.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "" # empty for Netlify root
+url: "https://swaitesting.netlify.app" # Netlify site URL
 twitter_username: jekyllrb
 github_username: jekyll
 

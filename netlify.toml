@@ -1,6 +1,6 @@
 [build]
-  # Only deploy the CMS admin from this repo to Netlify
-  publish = "netlify-deploy"
+  # Build and publish the full Jekyll site
+  publish = "_site"
   command = "bash scripts/netlify-build.sh"
 
 [build.environment]
@@ -8,10 +8,8 @@
   RUBY_VERSION = "3.4.7"
   JEKYLL_ENV = "production"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# Note: Do not force SPA-style redirect for a static Jekyll site.
+# If you add client-side routing later, scope redirects to those paths only.
 
 [[headers]]
   for = "/*"
