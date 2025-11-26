@@ -14,4 +14,4 @@ gem "minima"
 gem "jekyll-feed"
 gem "jekyll-sitemap"
 gem "jekyll-paginate-v2"
-gem "wdm", ">= 0.1.0", platforms: [:mingw, :mswin]
+gem "wdm", ">= 0.1.0", platforms: [:windows]
