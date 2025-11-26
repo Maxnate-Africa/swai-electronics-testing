@@ -1,74 +1,61 @@
 backend:
   name: git-gateway
   branch: master
-  # CMS hosted on Netlify, edits GitHub repo for Pages site
-  site_domain: swaitesting.netlify.app
 
-# Publish mode
-publish_mode: editorial_workflow
+media_folder: "public/images"
+public_folder: "/images"
 
-# Media management
-media_folder: "assets/images"
-public_folder: "/assets/images"
-
-# Collections
 collections:
-  # Products Collection
   - name: "products"
     label: "Products"
-    folder: "_products"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - {label: "Layout", name: "layout", widget: "hidden", default: "product"}
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Price", name: "price", widget: "number", value_type: "float"}
-      - {label: "Sale Price", name: "sale_price", widget: "number", value_type: "float", required: false}
-      - {label: "On Sale", name: "on_sale", widget: "boolean", default: false, required: false}
-      - {label: "Discount Percentage", name: "discount_percentage", widget: "number", value_type: "int", required: false}
-      - {label: "Category", name: "category", widget: "select", options: ["Electronics", "Appliances", "Audio", "Video", "Smart Devices", "Accessories"]}
-      - {label: "Brand", name: "brand", widget: "string", required: false}
-      - {label: "Model", name: "model", widget: "string", required: false}
-      - {label: "Image", name: "image", widget: "image"}
-      - {label: "Description", name: "description", widget: "text"}
-      - {label: "Features", name: "features", widget: "list", required: false}
-      - {label: "Specifications", name: "specifications", widget: "list", fields: [
-          {label: "Key", name: "key", widget: "string"},
-          {label: "Value", name: "value", widget: "string"}
-        ], required: false}
-      - {label: "In Stock", name: "in_stock", widget: "boolean", default: true}
-      - {label: "Featured", name: "featured", widget: "boolean", default: false}
-      - {label: "Date", name: "date", widget: "datetime"}
+    files:
+      - label: "All Products"
+        name: "products"
+        file: "public/data/products.json"
+        fields:
+          - label: "Products"
+            name: "products"
+            widget: "list"
+            fields:
+              - {label: "ID", name: "id", widget: "string", hint: "Unique identifier (e.g., tv-001)"}
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Category", name: "category", widget: "select", options: ["televisions", "audio", "home-appliances"]}
+              - {label: "Price (TSh)", name: "price", widget: "number", value_type: "int", min: 0}
+              - {label: "Sale Price (TSh)", name: "sale_price", widget: "number", value_type: "int", min: 0, required: false, hint: "Leave empty if not on sale"}
+              - {label: "Image", name: "image", widget: "image", required: false}
+              - {label: "Description", name: "description", widget: "text", required: false}
+              - {label: "Featured", name: "featured", widget: "boolean", default: false}
 
-  # Special Offers Collection
   - name: "offers"
     label: "Special Offers"
-    folder: "_offers"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Description", name: "description", widget: "text"}
-      - {label: "Discount", name: "discount", widget: "string", hint: "e.g., '20% OFF' or 'Buy 1 Get 1'"}
-      - {label: "Start Date", name: "start_date", widget: "datetime"}
-      - {label: "End Date", name: "end_date", widget: "datetime"}
-      - {label: "Image", name: "image", widget: "image", required: false}
-      - {label: "Active", name: "active", widget: "boolean", default: true}
-      - {label: "Priority", name: "priority", widget: "select", options: ["low", "medium", "high"], default: "medium"}
+    files:
+      - label: "Active Offers"
+        name: "offers"
+        file: "public/data/offers.json"
+        fields:
+          - label: "Offers"
+            name: "offers"
+            widget: "list"
+            fields:
+              - {label: "ID", name: "id", widget: "string", hint: "Unique identifier (e.g., offer-001)"}
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Discount", name: "discount", widget: "string", hint: "e.g., '20% OFF' or 'Buy 1 Get 1'"}
+              - {label: "Expiry Date", name: "expiry", widget: "datetime"}
+              - {label: "Description", name: "description", widget: "text", required: false}
 
-  # Site Settings
   - name: "settings"
     label: "Site Settings"
     files:
-      - label: "Configuration"
-        name: "config"
-        file: "_config.yml"
+      - label: "Filters & Categories"
+        name: "filters"
+        file: "public/data/filters.json"
         fields:
-          - {label: "Site Title", name: "title", widget: "string"}
-          - {label: "Email", name: "email", widget: "string"}
-          - {label: "Description", name: "description", widget: "text"}
-          - {label: "Base URL", name: "baseurl", widget: "string"}
-          - {label: "URL", name: "url", widget: "string"}
-          - {label: "Google Analytics ID", name: "google_analytics_id", widget: "string", required: false}
-          - {label: "Meta Pixel ID", name: "meta_pixel_id", widget: "string", required: false}
-          - {label: "WhatsApp Phone", name: "whatsapp_phone", widget: "string"}
+          - {label: "Show All Products Link", name: "show_all_link", widget: "boolean", default: true}
+          - {label: "All Products Label", name: "all_label", widget: "string", default: "All Products"}
+          - {label: "Show Sale Filter", name: "show_sale_filter", widget: "boolean", default: true}
+          - {label: "Sale Filter Label", name: "sale_label", widget: "string", default: "🏷️ Sale Items"}
+          - label: "Categories"
+            name: "categories"
+            widget: "list"
+            hint: "Product category list"
+            field: {label: "Category", name: "category", widget: "string"}

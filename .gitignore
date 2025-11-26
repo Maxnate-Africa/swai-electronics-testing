@@ -1,74 +1,24 @@
-# Jekyll
-_site/
-.sass-cache/
-.jekyll-cache/
-.jekyll-metadata
-vendor/
-.bundle/
-
-# Deployment artifacts
-netlify-deploy/
-
-# Ruby
-*.gem
-*.rbc
-.config
-coverage
-InstalledFiles
-lib/bundler/man
-pkg
-rdoc
-spec/reports
-test/tmp
-test/version_tmp
-tmp
-
-# YARD artifacts
-.yardoc
-_yardoc
-doc/
-
-# OS Files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Editor files
-*.swp
-*.swo
-*~
-.vscode/
-.idea/
-
 # Logs
+logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Internal maintenance scripts (not needed in production)
-scripts/cleanup-images.ps1
+node_modules
+dist
+dist-ssr
+*.local
 
-# Generated responsive image variants (do not commit)
-assets/images/products/*-300.png
-assets/images/products/*-600.png
-assets/images/products/*-300.webp
-assets/images/products/*-600.webp
-assets/images/products/*.webp
-assets/images/products/*-300.avif
-assets/images/products/*-600.avif
-assets/images/products/*-900.avif
-assets/images/products/*.avif
-assets/images/products/variants-manifest.json
-
-# Environment variables
-.env
-.env.local
-.env.development
-.env.test
-.env.production
-
-# Backup files
-*.bak
-*.backup
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
