@@ -8,6 +8,7 @@ interface AdminContextType {
   products: Product[];
   offers: Offer[];
   filters: Filters;
+  categories: string[];
   loading: boolean;
   error: string | null;
   
@@ -175,6 +176,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
         products,
         offers,
         filters,
+        categories: filters.categories || [],
         loading,
         error,
         addProduct,

@@ -4,7 +4,7 @@ import AdminLayout from '../../components/AdminLayout';
 import type { Product } from '../../types';
 
 export default function Products() {
-  const { products, addProduct, updateProduct, deleteProduct } = useAdmin();
+  const { products, addProduct, updateProduct, deleteProduct, categories } = useAdmin();
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -310,13 +310,19 @@ export default function Products() {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="category">Category *</label>
-                  <input
-                    type="text"
+                  <select
                     id="category"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     required
-                  />
+                  >
+                    <option value="">Select a category</option>
+                    {categories.map((cat: string) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="form-group">
