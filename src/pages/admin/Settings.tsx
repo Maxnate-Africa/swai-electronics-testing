@@ -213,6 +213,15 @@ export default function Settings() {
                       } else {
                         // Show debug info if available (for allowlist troubleshooting)
                         let errorMsg = data.error || `HTTP ${res.status}`;
+                        
+                        // Show GitHub API error details if available
+                        if (data.status) {
+                          errorMsg += `\nGitHub Status: ${data.status}`;
+                        }
+                        if (data.details) {
+                          errorMsg += `\n\nGitHub Response:\n${data.details}`;
+                        }
+                        
                         if (data.debug) {
                           errorMsg += `\n\nDebug Info:\nUser ID: ${data.debug.userId || 'N/A'}\nEmails: ${JSON.stringify(data.debug.emails) || 'N/A'}`;
                           if (data.debug.allClaims) {
