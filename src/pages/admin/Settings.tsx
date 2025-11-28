@@ -1,15 +1,20 @@
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import AdminLayout from '../../components/AdminLayout';
 import { useAdmin } from '../../contexts/AdminContext';
 import { setGitHubToken, clearGitHubToken, hasGitHubToken, verifyToken } from '../../services/githubService';
 import { useState } from 'react';
 
+const WRITE_API_BASE = import.meta.env.VITE_WRITE_API_BASE as string;
+
 export default function Settings() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { products, offers, filters } = useAdmin();
   const HAS_API = !!import.meta.env.VITE_WRITE_API_BASE;
   const [tokenInput, setTokenInput] = useState('');
   const [tokenStatus, setTokenStatus] = useState<null | { ok: boolean; msg: string }>(null);
+  const [writeStatus, setWriteStatus] = useState<null | { ok: boolean; msg: string }>(null);
+  const [writePending, setWritePending] = useState(false);
 
   const stats = {
     totalProducts: products.length,
@@ -164,6 +169,66 @@ export default function Settings() {
               </button>
             </div>
           </div>
+
+          {/* Test Write Card */}
+          {HAS_API && (
+            <div className="settings-card">
+              <h3>Test Worker Write</h3>
+              <p className="settings-description">
+                Click the button below to perform a test write to the GitHub repo via the Cloudflare Worker.
+                This verifies your Clerk authentication and Worker allowlist are configured correctly.
+              </p>
+              <div className="button-group" style={{ marginTop: '1rem' }}>
+                <button
+                  className="btn-primary"
+                  disabled={writePending}
+                  onClick={async () => {
+                    setWritePending(true);
+                    setWriteStatus(null);
+                    try {
+                      const token = await getToken({ template: 'default' });
+                      if (!token) throw new Error('Could not get Clerk token. Are you signed in?');
+                      const res = await fetch(`${WRITE_API_BASE}/update-file`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                          owner: 'Maxnate-Africa',
+                          repo: 'swai-electronics-testing',
+                          path: 'public/data/test-write.json',
+                          message: 'test write via CMS Settings UI',
+                          content: JSON.stringify({
+                            source: 'CMS Settings',
+                            user: user?.primaryEmailAddress?.emailAddress || 'unknown',
+                            ts: new Date().toISOString(),
+                          }, null, 2),
+                        }),
+                      });
+                      const data = await res.json();
+                      if (res.ok) {
+                        setWriteStatus({ ok: true, msg: `Success! Commit: ${data.commit}` });
+                      } else {
+                        setWriteStatus({ ok: false, msg: data.error || `HTTP ${res.status}` });
+                      }
+                    } catch (e) {
+                      setWriteStatus({ ok: false, msg: e instanceof Error ? e.message : 'Unknown error' });
+                    } finally {
+                      setWritePending(false);
+                    }
+                  }}
+                >
+                  {writePending ? 'Writing…' : 'Test Write'}
+                </button>
+              </div>
+              {writeStatus && (
+                <p style={{ marginTop: '0.75rem', color: writeStatus.ok ? '#198754' : '#dc3545', fontWeight: 500 }}>
+                  {writeStatus.msg}
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </AdminLayout>
