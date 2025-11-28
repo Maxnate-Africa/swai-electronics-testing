@@ -6,7 +6,7 @@
       "discount": "30% OFF",
       "expiry": "2025-12-01",
       "description": "All TVs on discount!",
-      "active": true
+      "active": false
     },
     {
       "id": "2",
