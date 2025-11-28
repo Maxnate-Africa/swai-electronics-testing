@@ -73,7 +73,7 @@ export default {
 
         // If SHA not provided, fetch current file to get it (required for updates)
         if (!sha) {
-          const existingRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${branch || 'master'}`, {
+          const existingRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch || 'master'}`, {
             headers: {
               'Authorization': `token ${env.GH_TOKEN}`,
               'Accept': 'application/vnd.github+json',
@@ -87,7 +87,10 @@ export default {
           // If 404 (new file), sha stays undefined which is fine for creation
         }
 
-        const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
+        // Encode content to base64 (handle UTF-8 properly)
+        const contentBase64 = btoa(unescape(encodeURIComponent(content)));
+
+        const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`, {
           method: 'PUT',
           headers: {
             'Authorization': `token ${env.GH_TOKEN}`,
@@ -97,7 +100,7 @@ export default {
           },
           body: JSON.stringify({
             message,
-            content: btoa(content),
+            content: contentBase64,
             branch: branch || 'master',
             sha
           })
