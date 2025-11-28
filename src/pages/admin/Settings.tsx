@@ -129,24 +129,6 @@ export default function Settings() {
           </div>
 
           <div className="settings-card">
-            <h3>Quick Actions</h3>
-            <p className="settings-description">
-              Manage your content across all sections of the website.
-            </p>
-            <div className="button-group" style={{marginTop:'1rem', display:'flex', gap:'0.5rem', flexWrap:'wrap'}}>
-              <button className="btn-secondary" onClick={() => window.location.href = '/swai-electronics-testing/admin/products'}>
-                Manage Products
-              </button>
-              <button className="btn-secondary" onClick={() => window.location.href = '/swai-electronics-testing/admin/offers'}>
-                Manage Offers
-              </button>
-              <button className="btn-secondary" onClick={() => window.location.href = '/swai-electronics-testing/admin/filters'}>
-                Configure Filters
-              </button>
-            </div>
-          </div>
-
-          <div className="settings-card">
             <h3>Data Backup</h3>
             <p className="settings-description">
               Export all your content data (products, offers, filters) as a JSON backup file. You can also import from Excel via CSV, but CSV import is supported for <strong>Products only</strong>. Offers and Filters must be imported via JSON.
