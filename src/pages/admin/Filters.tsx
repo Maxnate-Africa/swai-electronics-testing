@@ -27,13 +27,17 @@ export default function FiltersManagement() {
   };
 
   const handleAddCategory = () => {
-    if (newCategory.trim() && !editedFilters.categories.includes(newCategory.trim())) {
-      setEditedFilters({
-        ...editedFilters,
-        categories: [...editedFilters.categories, newCategory.trim()]
-      });
-      setNewCategory('');
-    }
+    const name = newCategory.trim();
+    if (!name) return;
+    setEditedFilters(prev => {
+      const exists = prev.categories.some(c => c.toLowerCase() === name.toLowerCase());
+      if (exists) return prev;
+      return {
+        ...prev,
+        categories: [...prev.categories, name]
+      };
+    });
+    setNewCategory('');
   };
 
   const handleRemoveCategory = (category: string) => {
@@ -148,10 +152,10 @@ export default function FiltersManagement() {
               type="text"
               value={newCategory}
               onChange={e => setNewCategory(e.target.value)}
-              onKeyPress={e => e.key === 'Enter' && handleAddCategory()}
+              onKeyDown={e => e.key === 'Enter' && handleAddCategory()}
               placeholder="Add new category..."
             />
-            <button onClick={handleAddCategory} className="add-btn">
+            <button type="button" onClick={handleAddCategory} className="add-btn">
               Add Category
             </button>
           </div>

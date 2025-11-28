@@ -60,9 +60,9 @@ interface GitHubFile {
 /**
  * Get file content and SHA from GitHub
  */
-async function getFileFromGitHub(path: string): Promise<GitHubFile | null> {
+async function getFileFromGitHub(path: string, requireAuth: boolean = false): Promise<GitHubFile | null> {
   try {
-    const octokit = getOctokit(false);
+    const octokit = getOctokit(requireAuth);
     const { data } = await octokit.repos.getContent({
       owner: REPO_OWNER,
       repo: REPO_NAME,
@@ -163,19 +163,8 @@ export async function verifyToken(): Promise<{ login: string } | null> {
  * Handles both wrapped objects { "key": [...] } and bare arrays
  */
 async function readData<T>(filePath: string, wrapKey?: string): Promise<T[]> {
-  // Prefer API for authenticated reads (freshest + SHA support); otherwise use raw to avoid rate limits.
-  let content: string | null = null;
-  if (RUNTIME_GH_TOKEN) {
-    const file = await getFileFromGitHub(filePath);
-    content = file?.content ?? null;
-  } else {
-    content = await getFileFromRaw(filePath);
-    // Fallback to API if raw failed (e.g., network), accepting potential rate limits
-    if (content == null) {
-      const file = await getFileFromGitHub(filePath);
-      content = file?.content ?? null;
-    }
-  }
+  // Always prefer raw reads to avoid API rate limits.
+  const content: string | null = await getFileFromRaw(filePath);
   if (!content) return [];
   const parsed = JSON.parse(content);
   
@@ -198,12 +187,17 @@ async function writeData<T>(
   commitMessage: string,
   wrapKey?: string
 ): Promise<void> {
-  const file = await getFileFromGitHub(filePath);
-  
   // If wrapKey provided, wrap the array in an object
   const contentToSave = wrapKey ? { [wrapKey]: data } : data;
   
   const content = JSON.stringify(contentToSave, null, 2);
+  // Delegate SHA resolution to Worker when API_BASE is set
+  if (API_BASE) {
+    await updateFileOnGitHub(filePath, content, commitMessage);
+    return;
+  }
+  // Otherwise, fetch SHA with authenticated API
+  const file = await getFileFromGitHub(filePath, true);
   await updateFileOnGitHub(filePath, content, commitMessage, file?.sha);
 }
 
@@ -287,17 +281,7 @@ export async function deleteOffer(id: string): Promise<void> {
 // ==================== FILTERS ====================
 
 export async function getFilters(): Promise<Filters> {
-  let content: string | null = null;
-  if (RUNTIME_GH_TOKEN) {
-    const file = await getFileFromGitHub(FILES.FILTERS);
-    content = file?.content ?? null;
-  } else {
-    content = await getFileFromRaw(FILES.FILTERS);
-    if (content == null) {
-      const file = await getFileFromGitHub(FILES.FILTERS);
-      content = file?.content ?? null;
-    }
-  }
+  let content: string | null = await getFileFromRaw(FILES.FILTERS);
   if (!content) {
     // Return default filters structure
     return {
