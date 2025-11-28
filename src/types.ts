@@ -11,6 +11,7 @@ export interface Product {
   featured?: boolean;
   stock?: number;
   inStock?: boolean;
+  published?: boolean;
   created_at?: string;
   updated_at?: string;
 }

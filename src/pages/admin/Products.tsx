@@ -15,11 +15,12 @@ export default function Products() {
     price: 0,
     sale_price: undefined as number | undefined,
     longDescription: '',
-    specsText: '',
+    specs: [] as { key: string; value: string }[],
     image: '',
     featured: false,
     stock: 0,
     inStock: true,
+    published: true,
   });
 
   const optimizeImage = async (file: File): Promise<string> => {
@@ -129,14 +130,14 @@ export default function Products() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent, publishStatus: boolean) => {
     e.preventDefault();
 
     const specs: Record<string,string> = {};
-    formData.specsText.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(line => {
-      const [k, ...rest] = line.split(':');
-      const v = rest.join(':').trim();
-      if (k && v) specs[k.trim()] = v;
+    formData.specs.forEach(({ key, value }) => {
+      if (key.trim() && value.trim()) {
+        specs[key.trim()] = value.trim();
+      }
     });
 
     const payload = {
@@ -150,6 +151,7 @@ export default function Products() {
       featured: formData.featured,
       stock: formData.stock,
       inStock: formData.inStock,
+      published: publishStatus,
     };
 
     if (editingProduct) {
@@ -168,11 +170,12 @@ export default function Products() {
       price: 0,
       sale_price: undefined,
       longDescription: '',
-      specsText: '',
+      specs: [],
       image: '',
       featured: false,
       stock: 0,
       inStock: true,
+      published: true,
     });
     setImagePreview('');
     setEditingProduct(null);
@@ -187,11 +190,12 @@ export default function Products() {
       price: product.price,
       sale_price: product.sale_price,
       longDescription: product.longDescription || '',
-      specsText: product.specs ? Object.entries(product.specs).map(([k,v]) => `${k}: ${v}`).join('\n') : '',
+      specs: product.specs ? Object.entries(product.specs).map(([k, v]) => ({ key: k, value: v })) : [],
       image: product.image || '',
       featured: product.featured || false,
       stock: product.stock || 0,
       inStock: product.inStock !== undefined ? product.inStock : true,
+      published: product.published !== undefined ? product.published : true,
     });
     setImagePreview(product.image || '');
     setShowModal(true);
@@ -291,7 +295,7 @@ export default function Products() {
               <button className="modal-close" onClick={resetForm}>×</button>
             </div>
 
-            <form onSubmit={handleSubmit} className="modal-form">
+            <form className="modal-form">
               <div className="form-group">
                 <label htmlFor="title">Product Title *</label>
                 <input
@@ -411,14 +415,75 @@ export default function Products() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="specs">Specifications (key: value per line)</label>
-                <textarea
-                  id="specs"
-                  value={formData.specsText}
-                  onChange={(e) => setFormData({ ...formData, specsText: e.target.value })}
-                  rows={6}
-                  placeholder={"Brand: Samsung\nSize: 55\"\nResolution: 4K\nPanel: QLED"}
-                />
+                <label>Specifications</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {formData.specs.map((spec, index) => (
+                    <div key={index} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <input
+                        type="text"
+                        placeholder="Key (e.g., Brand)"
+                        value={spec.key}
+                        onChange={(e) => {
+                          const newSpecs = [...formData.specs];
+                          newSpecs[index].key = e.target.value;
+                          setFormData({ ...formData, specs: newSpecs });
+                        }}
+                        style={{ flex: '1' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Value (e.g., Samsung)"
+                        value={spec.value}
+                        onChange={(e) => {
+                          const newSpecs = [...formData.specs];
+                          newSpecs[index].value = e.target.value;
+                          setFormData({ ...formData, specs: newSpecs });
+                        }}
+                        style={{ flex: '1' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newSpecs = formData.specs.filter((_, i) => i !== index);
+                          setFormData({ ...formData, specs: newSpecs });
+                        }}
+                        style={{
+                          padding: '0.5rem',
+                          background: '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '36px',
+                          height: '36px'
+                        }}
+                        title="Remove specification"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormData({ ...formData, specs: [...formData.specs, { key: '', value: '' }] });
+                    }}
+                    className="btn-secondary"
+                    style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Specification
+                  </button>
+                </div>
               </div>
 
               <div className="form-group">
@@ -444,11 +509,26 @@ export default function Products() {
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="btn-secondary" onClick={resetForm}>
-                  Cancel
+                <button 
+                  type="button" 
+                  className="btn-secondary" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmit(e as any, false);
+                  }}
+                  style={{background: '#6c757d'}}
+                >
+                  Unpublish
                 </button>
-                <button type="submit" className="btn-primary">
-                  {editingProduct ? 'Update Product' : 'Add Product'}
+                <button 
+                  type="button" 
+                  className="btn-primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleSubmit(e as any, true);
+                  }}
+                >
+                  {editingProduct ? 'Update & Publish' : 'Publish'}
                 </button>
               </div>
             </form>
