@@ -75,7 +75,8 @@ export default {
           headers: {
             'Authorization': `token ${env.GH_TOKEN}`,
             'Accept': 'application/vnd.github+json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'User-Agent': 'Swai-Electronics-CMS-Worker/1.0'
           },
           body: JSON.stringify({
             message,
