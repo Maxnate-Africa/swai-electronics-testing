@@ -186,7 +186,13 @@ export default function Settings() {
                     setWritePending(true);
                     setWriteStatus(null);
                     try {
-                      const token = await getToken({ template: 'default' });
+                      let token: string | null | undefined = null;
+                      try {
+                        token = await getToken({ template: 'default' });
+                      } catch (_) {
+                        // Fallback: try without template if none exists
+                        token = await getToken();
+                      }
                       if (!token) throw new Error('Could not get Clerk token. Are you signed in?');
                       const res = await fetch(`${WRITE_API_BASE}/update-file`, {
                         method: 'POST',
