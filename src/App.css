@@ -3,6 +3,41 @@
   min-height: 100vh;
 }
 
+/* Responsive product grid */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+@media (max-width: 1024px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); padding: 12px; }
+  .product-image { min-height: 140px; }
+}
+@media (max-width: 480px) {
+  .products-grid { grid-template-columns: 1fr; gap: 12px; padding: 10px; }
+  .product-card { border-radius: 10px; }
+}
+
+/* Product detail responsive */
+.product-detail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 16px;
+}
+@media (max-width: 768px) {
+  .product-detail { grid-template-columns: 1fr; }
+}
+/* App.css - Reset default Vite styles */
+#root {
+  min-height: 100vh;
+}
+
 .product-card {
   display: flex;
   flex-direction: column;
@@ -70,6 +105,112 @@
 .original-price {
   text-decoration: line-through;
   color: #999;
+}
+
+.order-button {
+  display: inline-block;
+  margin-top: 16px;
+  background: #25D366; /* WhatsApp green */
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(37,211,102,0.35);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.order-button:hover {
+  background: #1ebe5a;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(30,190,90,0.4);
+}
+
+/* Desktop fallback modal */
+.fallback-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+.fallback-modal {
+  background: #ffffff;
+  max-width: 560px;
+  width: 100%;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  animation: modalFade 0.25s ease;
+}
+.fallback-modal h3 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+.fallback-modal p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+}
+.fallback-message-box {
+  background: #f7f7f7;
+  border: 1px solid #e0e0e0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.4;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-bottom: 18px;
+}
+.fallback-message-box code {
+  white-space: pre-wrap;
+  display: block;
+  color: #333;
+  font-family: system-ui, sans-serif;
+}
+.fallback-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn-copy,
+.btn-open-web,
+.btn-close {
+  border: none;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.btn-copy {
+  background: #25D366;
+  color: #fff;
+}
+.btn-copy:hover { background: #1ebe5a; }
+.btn-open-web {
+  background: #075E54;
+  color: #fff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-open-web:hover { background: #064c45; }
+.btn-close {
+  background: #e53935;
+  color: #fff;
+}
+.btn-close:hover { background: #d32f2f; }
+
+@keyframes modalFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .card-actions {

@@ -5,6 +5,8 @@ import type { Product } from '../types';
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
+  const [showFallback, setShowFallback] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const base = import.meta.env.BASE_URL;
@@ -68,8 +70,63 @@ export default function ProductDetail() {
           </div>
         )}
 
-        <button className="cta-button">Contact Us</button>
+        {(() => {
+          const phone = '255685129530';
+          const displayPrice = product.sale_price ? product.sale_price : product.price;
+          const msg = `Hello Swai Electronics! I would like to order: ${product.title} (ID: ${product.id}). Category: ${product.category}. Price: TSh ${displayPrice.toLocaleString()}${product.sale_price ? ` (On Sale, original TSh ${product.price.toLocaleString()})` : ''}. Please confirm availability & delivery.`;
+          const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+          return (
+            <button
+              type="button"
+              className="order-button"
+              aria-label={`Order ${product.title} via WhatsApp`}
+              onClick={() => {
+                if (isMobile) {
+                  window.open(waLink, '_blank');
+                } else {
+                  setShowFallback(true);
+                }
+              }}
+            >
+              Order via WhatsApp
+            </button>
+          );
+        })()}
       </div>
+      {showFallback && product && (
+        <div className="fallback-overlay" role="dialog" aria-modal="true" aria-label="WhatsApp Order Fallback">
+          <div className="fallback-modal">
+            <h3>Order via WhatsApp</h3>
+            <p>You are on a desktop device. Copy the message below and send it manually through WhatsApp Web or your phone.</p>
+            <div className="fallback-message-box">
+              <code>{`Hello Swai Electronics! I would like to order: ${product.title} (ID: ${product.id}). Category: ${product.category}. Price: TSh ${(product.sale_price ? product.sale_price : product.price).toLocaleString()}${product.sale_price ? ` (On Sale, original TSh ${product.price.toLocaleString()})` : ''}. Please confirm availability & delivery.`}</code>
+            </div>
+            <div className="fallback-actions">
+              <button
+                type="button"
+                className="btn-copy"
+                onClick={() => {
+                  const text = `Hello Swai Electronics! I would like to order: ${product.title} (ID: ${product.id}). Category: ${product.category}. Price: TSh ${(product.sale_price ? product.sale_price : product.price).toLocaleString()}${product.sale_price ? ` (On Sale, original TSh ${product.price.toLocaleString()})` : ''}. Please confirm availability & delivery.`;
+                  navigator.clipboard.writeText(text).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1800);
+                  }).catch(() => {});
+                }}
+              >
+                {copied ? 'Copied!' : 'Copy Message'}
+              </button>
+              <a
+                href={`https://wa.me/255685129530`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-open-web"
+              >Open WhatsApp Web</a>
+              <button type="button" className="btn-close" onClick={() => setShowFallback(false)}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
