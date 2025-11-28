@@ -9,10 +9,7 @@
       "image": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400",
       "description": "Crystal clear 4K UHD display with smart features",
       "featured": true,
-      "stock": 500,
-      "longDescription": "",
-      "specs": {},
-      "updated_at": "2025-11-28T14:40:12.015Z"
+      "stock": 5
     },
     {
       "id": "2",
@@ -43,7 +40,10 @@
       "image": "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400",
       "description": "Portable waterproof speaker with deep bass",
       "featured": false,
-      "stock": 20
+      "stock": 200,
+      "longDescription": "",
+      "specs": {},
+      "updated_at": "2025-11-28T14:40:38.333Z"
     },
     {
       "id": "5",
