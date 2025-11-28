@@ -216,7 +216,12 @@ export default function Settings() {
                       if (res.ok) {
                         setWriteStatus({ ok: true, msg: `Success! Commit: ${data.commit}` });
                       } else {
-                        setWriteStatus({ ok: false, msg: data.error || `HTTP ${res.status}` });
+                        // Show debug info if available (for allowlist troubleshooting)
+                        let errorMsg = data.error || `HTTP ${res.status}`;
+                        if (data.debug) {
+                          errorMsg += `\n\nDebug Info:\nUser ID: ${data.debug.userId || 'N/A'}\nEmails: ${JSON.stringify(data.debug.emails) || 'N/A'}`;
+                        }
+                        setWriteStatus({ ok: false, msg: errorMsg });
                       }
                     } catch (e) {
                       setWriteStatus({ ok: false, msg: e instanceof Error ? e.message : 'Unknown error' });
@@ -229,9 +234,9 @@ export default function Settings() {
                 </button>
               </div>
               {writeStatus && (
-                <p style={{ marginTop: '0.75rem', color: writeStatus.ok ? '#198754' : '#dc3545', fontWeight: 500 }}>
+                <div style={{ marginTop: '0.75rem', color: writeStatus.ok ? '#198754' : '#dc3545', fontWeight: 500, whiteSpace: 'pre-wrap', fontFamily: writeStatus.ok ? 'inherit' : 'monospace', fontSize: writeStatus.ok ? 'inherit' : '0.9em' }}>
                   {writeStatus.msg}
-                </p>
+                </div>
               )}
             </div>
           )}
