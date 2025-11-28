@@ -7,6 +7,8 @@ compatibility_date = "2024-01-01"
 CORS_ORIGINS = "http://localhost:5173, https://maxnate-africa.github.io"
 # Enforce JWT verification for writes
 REQUIRE_AUTH = "true"
+# Include user id/email hints in 403 responses when true (for onboarding/debug)
+DEBUG_IDS = "true"
 # Set these after retrieving your Clerk instance domain from dashboard:
 # Example domain: vital-cicada-17.clerk.accounts.dev
 # JWKS URL format: https://<domain>/.well-known/jwks.json
@@ -15,4 +17,6 @@ CLERK_JWKS_URL = "https://vital-cicada-17.clerk.accounts.dev/.well-known/jwks.js
 CLERK_ISSUER = "https://vital-cicada-17.clerk.accounts.dev"
  # Optional comma separated allowlist of editor emails (lowercase). Leave empty to allow all authenticated users.
  ALLOWED_EMAILS = "maxnateafrica@gmail.com, victorswai04@gmail.com"
+	# Optional allowlist of Clerk user IDs (sub claim)
+	ALLOWED_USER_IDS = ""
 

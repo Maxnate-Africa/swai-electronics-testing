@@ -12,17 +12,50 @@ export default {
           if (!claims) return json({ error: 'Unauthorized' }, 401, request, env);
 
           // Optional claim filtering by email list
-          if (env.ALLOWED_EMAILS) {
+          // Optional allowlist by email or user id
+          if (env.ALLOWED_EMAILS || env.ALLOWED_USER_IDS) {
             const allowed = env.ALLOWED_EMAILS.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+            const allowedUserIds = (env.ALLOWED_USER_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
             const candidateEmails = [];
-            if (claims.email) candidateEmails.push(String(claims.email));
-            if (claims.email_address) candidateEmails.push(String(claims.email_address));
-            if (claims.primary_email_address) candidateEmails.push(String(claims.primary_email_address));
-            if (Array.isArray(claims.email_addresses)) candidateEmails.push(...claims.email_addresses.map(e => String(e)));
-            const normalized = candidateEmails.map(e => e.toLowerCase());
-            const matches = normalized.some(e => allowed.includes(e));
-            if (allowed.length && !matches) {
-              return json({ error: 'Forbidden: email not allowed' }, 403, request, env);
+            // Common single-value claims
+            if (claims.email && typeof claims.email === 'string') candidateEmails.push(claims.email);
+            if (claims.email_address && typeof claims.email_address === 'string') candidateEmails.push(claims.email_address);
+            if (claims.primary_email_address && typeof claims.primary_email_address === 'string') candidateEmails.push(claims.primary_email_address);
+
+            // Arrays of email strings or objects
+            if (Array.isArray(claims.email_addresses)) {
+              for (const item of claims.email_addresses) {
+                if (!item) continue;
+                if (typeof item === 'string') {
+                  candidateEmails.push(item);
+                } else if (typeof item === 'object') {
+                  if (typeof item.email === 'string') candidateEmails.push(item.email);
+                  if (typeof item.email_address === 'string') candidateEmails.push(item.email_address);
+                }
+              }
+            }
+
+            // Some templates might expose emails under `emails`
+            if (Array.isArray(claims.emails)) {
+              for (const item of claims.emails) {
+                if (!item) continue;
+                if (typeof item === 'string') {
+                  candidateEmails.push(item);
+                } else if (typeof item === 'object') {
+                  if (typeof item.email === 'string') candidateEmails.push(item.email);
+                  if (typeof item.email_address === 'string') candidateEmails.push(item.email_address);
+                }
+              }
+            }
+
+            const normalized = candidateEmails.map(e => String(e).toLowerCase()).filter(Boolean);
+            const emailMatches = allowed.length ? normalized.some(e => allowed.includes(e)) : false;
+            const userId = typeof claims.sub === 'string' ? claims.sub : null;
+            const idMatches = allowedUserIds.length && userId ? allowedUserIds.includes(userId) : false;
+
+            if ((allowed.length || allowedUserIds.length) && !emailMatches && !idMatches) {
+              const debug = env.DEBUG_IDS === 'true' ? { userId, emails: normalized } : undefined;
+              return json({ error: 'Forbidden: email/user not allowed', ... (debug ? { debug } : {}) }, 403, request, env);
             }
           }
         }
