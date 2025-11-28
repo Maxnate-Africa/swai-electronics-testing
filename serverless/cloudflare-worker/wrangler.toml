@@ -3,13 +3,18 @@ main = "worker.js"
 compatibility_date = "2024-01-01"
 
 [vars]
-# Comma separated origins, e.g. https://maxnate-africa.github.io, http://localhost:5173
+# Comma separated origins (production + local)
 CORS_ORIGINS = "http://localhost:5173, https://maxnate-africa.github.io"
+# Enforce JWT verification for writes
 REQUIRE_AUTH = "true"
-# Clerk JWKS URL (e.g., https://<instance>.clerk.accounts.dev/.well-known/jwks.json)
-CLERK_JWKS_URL = ""
-# Optional issuer prefix check (e.g., https://<instance>.clerk.accounts.dev)
-CLERK_ISSUER = ""
+# Set these after retrieving your Clerk instance domain from dashboard:
+# Example domain: vital-cicada-17.clerk.accounts.dev
+# JWKS URL format: https://<domain>/.well-known/jwks.json
+CLERK_JWKS_URL = "https://vital-cicada-17.clerk.accounts.dev/.well-known/jwks.json"
+# Issuer should match exactly the base domain (no trailing slash)
+CLERK_ISSUER = "https://vital-cicada-17.clerk.accounts.dev"
+ # Optional comma separated allowlist of editor emails (lowercase). Leave empty to allow all authenticated users.
+ ALLOWED_EMAILS = ""
 
 [secrets]
 # GH_TOKEN will be set via `wrangler secret put GH_TOKEN`

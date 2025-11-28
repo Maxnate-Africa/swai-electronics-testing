@@ -10,6 +10,21 @@ export default {
         if (env.REQUIRE_AUTH === 'true') {
           const claims = await verifyClerkJWT(request, env);
           if (!claims) return json({ error: 'Unauthorized' }, 401, request, env);
+
+          // Optional claim filtering by email list
+          if (env.ALLOWED_EMAILS) {
+            const allowed = env.ALLOWED_EMAILS.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+            const candidateEmails = [];
+            if (claims.email) candidateEmails.push(String(claims.email));
+            if (claims.email_address) candidateEmails.push(String(claims.email_address));
+            if (claims.primary_email_address) candidateEmails.push(String(claims.primary_email_address));
+            if (Array.isArray(claims.email_addresses)) candidateEmails.push(...claims.email_addresses.map(e => String(e)));
+            const normalized = candidateEmails.map(e => e.toLowerCase());
+            const matches = normalized.some(e => allowed.includes(e));
+            if (allowed.length && !matches) {
+              return json({ error: 'Forbidden: email not allowed' }, 403, request, env);
+            }
+          }
         }
 
         const body = await request.json();
