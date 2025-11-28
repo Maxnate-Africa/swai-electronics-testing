@@ -9,7 +9,10 @@
       "image": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400",
       "description": "Crystal clear 4K UHD display with smart features",
       "featured": true,
-      "stock": 5
+      "stock": 500,
+      "longDescription": "",
+      "specs": {},
+      "updated_at": "2025-11-28T14:38:57.639Z"
     },
     {
       "id": "2",
