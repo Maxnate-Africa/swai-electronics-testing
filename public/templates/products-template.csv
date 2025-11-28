@@ -1,2 +1,2 @@
-title,category,price,sale_price,image,description,featured,stock,id,created_at
-Samsung TV 55",televisions,850000,750000,/swai-electronics-testing/assets/images/tv.jpg,4K Smart TV,true,10,,
+title,category,price,sale_price,image,description,longDescription,specs,featured,stock,inStock,published,id,created_at,updated_at
+Samsung TV 55",televisions,850000,750000,/swai-electronics-testing/assets/images/tv.jpg,4K Smart TV,"Experience stunning 4K resolution with Samsung QLED technology. Features smart TV capabilities, HDR support, and multiple HDMI ports for all your devices.","Brand: Samsung | Size: 55"" | Resolution: 4K | Panel: QLED | HDR: Yes | Smart TV: Yes",true,10,true,true,,,"
