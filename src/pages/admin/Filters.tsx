@@ -191,14 +191,6 @@ export default function FiltersManagement() {
             )}
           </div>
         </section>
-
-        {/* Preview */}
-        <section className="filter-section preview-section">
-          <h2>JSON Preview</h2>
-          <pre className="json-preview">
-            {JSON.stringify(editedFilters, null, 2)}
-          </pre>
-        </section>
       </div>
     </div>
   );
