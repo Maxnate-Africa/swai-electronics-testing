@@ -14,7 +14,7 @@ export default {
           // Optional claim filtering by email list
           // Optional allowlist by email or user id
           if (env.ALLOWED_EMAILS || env.ALLOWED_USER_IDS) {
-            const allowed = env.ALLOWED_EMAILS.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+            const allowed = (env.ALLOWED_EMAILS || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
             const allowedUserIds = (env.ALLOWED_USER_IDS || '').split(',').map(s => s.trim()).filter(Boolean);
             const candidateEmails = [];
             // Common single-value claims
