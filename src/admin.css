@@ -468,6 +468,28 @@
     color: var(--maxnate-danger);
 }
 
+.admin-stock-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-stock-badge.in-stock {
+    background: rgba(76, 175, 80, 0.15);
+    color: #2e7d32;
+    border: 1px solid #4caf50;
+}
+
+.admin-stock-badge.out-of-stock {
+    background: rgba(158, 158, 158, 0.15);
+    color: #616161;
+    border: 1px solid #9e9e9e;
+}
+
 /* ==================== MODAL ==================== */
 
 .modal-overlay {

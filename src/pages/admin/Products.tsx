@@ -12,12 +12,12 @@ export default function Products() {
     category: '',
     price: 0,
     sale_price: undefined as number | undefined,
-    description: '',
     longDescription: '',
     specsText: '',
     image: '',
     featured: false,
     stock: 0,
+    inStock: true,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -35,12 +35,12 @@ export default function Products() {
       category: formData.category,
       price: formData.price,
       sale_price: formData.sale_price,
-      description: formData.description,
       longDescription: formData.longDescription,
       specs,
       image: formData.image,
       featured: formData.featured,
       stock: formData.stock,
+      inStock: formData.inStock,
     };
 
     if (editingProduct) {
@@ -58,12 +58,12 @@ export default function Products() {
       category: '',
       price: 0,
       sale_price: undefined,
-      description: '',
       longDescription: '',
       specsText: '',
       image: '',
       featured: false,
       stock: 0,
+      inStock: true,
     });
     setEditingProduct(null);
     setShowModal(false);
@@ -76,12 +76,12 @@ export default function Products() {
       category: product.category,
       price: product.price,
       sale_price: product.sale_price,
-      description: product.description || '',
       longDescription: product.longDescription || '',
       specsText: product.specs ? Object.entries(product.specs).map(([k,v]) => `${k}: ${v}`).join('\n') : '',
       image: product.image || '',
       featured: product.featured || false,
       stock: product.stock || 0,
+      inStock: product.inStock !== undefined ? product.inStock : true,
     });
     setShowModal(true);
   };
@@ -116,6 +116,7 @@ export default function Products() {
                 <th>Price</th>
                 <th>Sale Price</th>
                 <th>Stock</th>
+                <th>Status</th>
                 <th>Featured</th>
                 <th>Actions</th>
               </tr>
@@ -123,10 +124,12 @@ export default function Products() {
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="empty-state">No products found. Add your first product!</td>
+                  <td colSpan={9} className="empty-state">No products found. Add your first product!</td>
                 </tr>
               ) : (
-                products.map((product) => (
+                products.map((product) => {
+                  const isInStock = product.inStock !== undefined ? product.inStock : (product.stock ? product.stock > 0 : true);
+                  return (
                   <tr key={product.id}>
                     <td>
                       {product.image && (
@@ -138,6 +141,11 @@ export default function Products() {
                     <td>TZS {product.price.toLocaleString()}</td>
                     <td>{product.sale_price ? `TZS ${product.sale_price.toLocaleString()}` : '-'}</td>
                     <td>{product.stock || 0}</td>
+                    <td>
+                      <span className={`admin-stock-badge ${isInStock ? 'in-stock' : 'out-of-stock'}`}>
+                        {isInStock ? 'In Stock' : 'Out of Stock'}
+                      </span>
+                    </td>
                     <td>{product.featured ? '✓' : '-'}</td>
                     <td>
                       <div className="action-buttons">
@@ -156,7 +164,8 @@ export default function Products() {
                       </div>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -241,23 +250,13 @@ export default function Products() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="description">Description</label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  rows={4}
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="longDescription">Long Description</label>
+                <label htmlFor="longDescription">Description</label>
                 <textarea
                   id="longDescription"
                   value={formData.longDescription}
                   onChange={(e) => setFormData({ ...formData, longDescription: e.target.value })}
-                  rows={6}
-                  placeholder="Detailed information, usage notes, warranties, etc."
+                  rows={8}
+                  placeholder="Detailed product information, features, usage notes, warranties, etc."
                 />
               </div>
 
@@ -280,6 +279,17 @@ export default function Products() {
                     onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                   />
                   <span>Featured Product</span>
+                </label>
+              </div>
+
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={formData.inStock}
+                    onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
+                  />
+                  <span>In Stock</span>
                 </label>
               </div>
 

@@ -10,6 +10,7 @@ export interface Product {
   specs?: Record<string, string>;
   featured?: boolean;
   stock?: number;
+  inStock?: boolean;
   created_at?: string;
   updated_at?: string;
 }

@@ -20,6 +20,8 @@ export default function ProductDetail() {
 
   if (!product) return <div>Loading...</div>;
 
+  const isInStock = product.inStock !== undefined ? product.inStock : (product.stock ? product.stock > 0 : true);
+
   return (
     <div className="product-detail">
       <div className="product-image">
@@ -33,6 +35,11 @@ export default function ProductDetail() {
       <div className="product-info">
         <h1>{product.title}</h1>
         <p className="category">{product.category}</p>
+        <div className="stock-status">
+          <span className={`stock-badge-detail ${isInStock ? 'in-stock' : 'out-of-stock'}`}>
+            {isInStock ? '✓ In Stock' : '✗ Out of Stock'}
+          </span>
+        </div>
         
         <div className="price">
           {product.sale_price ? (
@@ -45,16 +52,9 @@ export default function ProductDetail() {
           )}
         </div>
 
-        {product.description && (
+        {product.longDescription && (
           <div className="description">
             <h3>Description</h3>
-            <p>{product.description}</p>
-          </div>
-        )}
-
-        {product.longDescription && (
-          <div className="long-description">
-            <h3>Details</h3>
             <p>{product.longDescription}</p>
           </div>
         )}
