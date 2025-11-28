@@ -13,9 +13,11 @@
       "inStock": true,
       "longDescription": "",
       "specs": {
-        "Screen": "very wide"
+        "Resolution": "4K UHD (\\(3840\\times 2160\\) pixels)",
+        "Processor": "Crystal Processor 4K"
       },
-      "updated_at": "2025-11-28T16:15:06.604Z"
+      "updated_at": "2025-11-28T16:38:12.702Z",
+      "published": true
     },
     {
       "id": "2",
