@@ -20,11 +20,13 @@ if (!CLERK_PUBLISHABLE_KEY) {
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  // Build full URL path including base for Clerk redirect
+  const fullPath = import.meta.env.BASE_URL.replace(/\/$/, '') + location.pathname;
   return (
     <>
       <SignedIn>{children}</SignedIn>
       <SignedOut>
-        <RedirectToSignIn afterSignInUrl={location.pathname} afterSignUpUrl={location.pathname} />
+        <RedirectToSignIn afterSignInUrl={fullPath} afterSignUpUrl={fullPath} />
       </SignedOut>
     </>
   );
