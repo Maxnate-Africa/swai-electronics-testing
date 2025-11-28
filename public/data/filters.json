@@ -1,7 +1,7 @@
 {
   "show_all_link": true,
   "all_label": "Products",
-  "show_sale_filter": false,
+  "show_sale_filter": true,
   "sale_label": "🏷️ Sale Items",
   "categories": [
     "home-appliances",
