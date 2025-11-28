@@ -7,6 +7,9 @@ export interface Product {
   image?: string;
   description?: string;
   featured?: boolean;
+  stock?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Offer {
@@ -15,6 +18,8 @@ export interface Offer {
   discount: string;
   expiry: string;
   description?: string;
+  active?: boolean;
+  created_at?: string;
 }
 
 export interface Filters {
@@ -23,4 +28,9 @@ export interface Filters {
   show_sale_filter: boolean;
   sale_label: string;
   categories: string[];
+}
+
+export interface AdminUser {
+  email: string;
+  isAuthenticated: boolean;
 }

@@ -4,16 +4,16 @@ from pathlib import Path
 from PIL import Image
 
 """
-Responsive image variant generator.
-Keeps only original PNGs in version control (variants ignored by .gitignore).
-Generates WebP + PNG resized derivatives for performance in CI.
+Responsive image variant generator for React + Vite project.
+Generates WebP + AVIF + PNG resized derivatives for optimal web performance.
 
 Usage examples:
   python generate_images.py
   python generate_images.py --widths 300,600,900 --webp-quality 80 --webp-quality-original 85
+  python generate_images.py --enable-avif
 """
 
-PRODUCTS_DIR = Path('assets/images/products')
+PRODUCTS_DIR = Path('public/images')
 
 parser = argparse.ArgumentParser(description='Generate responsive image variants (PNG + WebP + AVIF).')
 parser.add_argument('--widths', default='300,600', help='Comma-separated list of target widths (integers).')

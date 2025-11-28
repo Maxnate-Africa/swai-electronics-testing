@@ -5,7 +5,8 @@ export default function OffersCard() {
   const [offers, setOffers] = useState<Offer[]>([]);
 
   useEffect(() => {
-    fetch('/data/offers.json')
+    const base = import.meta.env.BASE_URL;
+    fetch(`${base}data/offers.json`)
       .then(r => r.json())
       .then(data => setOffers(data.offers || []));
   }, []);
