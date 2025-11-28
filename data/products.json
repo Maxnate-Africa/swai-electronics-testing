@@ -9,7 +9,8 @@
       "image": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400",
       "description": "Crystal clear 4K UHD display with smart features",
       "featured": true,
-      "stock": 5
+      "stock": 5,
+      "inStock": true
     },
     {
       "id": "2",
@@ -19,7 +20,8 @@
       "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400",
       "description": "Premium noise-canceling wireless headphones",
       "featured": false,
-      "stock": 12
+      "stock": 12,
+      "inStock": true
     },
     {
       "id": "3",
@@ -30,7 +32,8 @@
       "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=400",
       "description": "8kg capacity with inverter technology",
       "featured": true,
-      "stock": 3
+      "stock": 3,
+      "inStock": true
     },
     {
       "id": "4",
@@ -40,7 +43,11 @@
       "image": "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400",
       "description": "Portable waterproof speaker with deep bass",
       "featured": false,
-      "stock": 20
+      "stock": 200,
+      "inStock": true,
+      "longDescription": "",
+      "specs": {},
+      "updated_at": "2025-11-28T14:40:38.333Z"
     },
     {
       "id": "5",
@@ -50,7 +57,8 @@
       "image": "https://images.unsplash.com/photo-1567690187548-f07b1d7bf5a9?w=400",
       "description": "Full HD LED TV with excellent picture quality",
       "featured": false,
-      "stock": 8
+      "stock": 8,
+      "inStock": true
     },
     {
       "id": "6",
@@ -60,7 +68,8 @@
       "image": "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=400",
       "description": "23L capacity with grill function",
       "featured": false,
-      "stock": 15
+      "stock": 15,
+      "inStock": true
     }
   ]
 }
