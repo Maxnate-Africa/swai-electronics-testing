@@ -28,14 +28,20 @@ export default function FiltersManagement() {
 
   const handleAddCategory = () => {
     const name = newCategory.trim();
-    if (!name) return;
-    setEditedFilters(prev => {
-      const exists = prev.categories.some(c => c.toLowerCase() === name.toLowerCase());
-      if (exists) return prev;
-      return {
-        ...prev,
-        categories: [...prev.categories, name]
-      };
+    if (!name) {
+      alert('Please enter a category name');
+      return;
+    }
+    
+    const exists = editedFilters.categories.some(c => c.toLowerCase() === name.toLowerCase());
+    if (exists) {
+      alert('Category already exists');
+      return;
+    }
+    
+    setEditedFilters({
+      ...editedFilters,
+      categories: [...editedFilters.categories, name]
     });
     setNewCategory('');
   };
