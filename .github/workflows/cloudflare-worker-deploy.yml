@@ -29,11 +29,15 @@ jobs:
 
       # Optional: set GH_TOKEN secret into Worker if provided in repo secrets
       - name: Configure Worker secret GH_TOKEN (optional)
-        if: ${{ secrets.CF_WORKER_GH_TOKEN != '' }}
-        run: echo "${{ secrets.CF_WORKER_GH_TOKEN }}" | wrangler secret put GH_TOKEN --config wrangler.toml --yes
+        continue-on-error: true
+        run: |
+          if [ -n "$GH_TOKEN_VALUE" ]; then
+            echo "$GH_TOKEN_VALUE" | wrangler secret put GH_TOKEN --config wrangler.toml --yes
+          fi
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GH_TOKEN_VALUE: ${{ secrets.CF_WORKER_GH_TOKEN }}
 
       - name: Deploy Worker
         run: wrangler deploy --config wrangler.toml
