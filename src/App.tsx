@@ -1,5 +1,6 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import Products from './pages/admin/Products';
@@ -18,11 +19,12 @@ if (!CLERK_PUBLISHABLE_KEY) {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
   return (
     <>
       <SignedIn>{children}</SignedIn>
       <SignedOut>
-        <RedirectToSignIn />
+        <RedirectToSignIn afterSignInUrl={location.pathname} afterSignUpUrl={location.pathname} />
       </SignedOut>
     </>
   );
@@ -162,14 +164,24 @@ function AppRoutes() {
   );
 }
 
-function App() {
+function ClerkProviderWithRoutes() {
+  const navigate = useNavigate();
+  
   return (
-    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+    <ClerkProvider 
+      publishableKey={CLERK_PUBLISHABLE_KEY}
+      routerPush={(to) => navigate(to)}
+      routerReplace={(to) => navigate(to, { replace: true })}
+    >
       <AdminProvider>
         <AppRoutes />
       </AdminProvider>
     </ClerkProvider>
   );
+}
+
+function App() {
+  return <ClerkProviderWithRoutes />;
 }
 
 export default App;
