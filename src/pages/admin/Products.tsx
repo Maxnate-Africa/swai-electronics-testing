@@ -13,6 +13,8 @@ export default function Products() {
     price: 0,
     sale_price: undefined as number | undefined,
     description: '',
+    longDescription: '',
+    specsText: '',
     image: '',
     featured: false,
     stock: 0,
@@ -21,10 +23,30 @@ export default function Products() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const specs: Record<string,string> = {};
+    formData.specsText.split(/\r?\n/).map(l => l.trim()).filter(Boolean).forEach(line => {
+      const [k, ...rest] = line.split(':');
+      const v = rest.join(':').trim();
+      if (k && v) specs[k.trim()] = v;
+    });
+
+    const payload = {
+      title: formData.title,
+      category: formData.category,
+      price: formData.price,
+      sale_price: formData.sale_price,
+      description: formData.description,
+      longDescription: formData.longDescription,
+      specs,
+      image: formData.image,
+      featured: formData.featured,
+      stock: formData.stock,
+    };
+
     if (editingProduct) {
-      updateProduct(editingProduct.id, formData);
+      updateProduct(editingProduct.id, payload);
     } else {
-      addProduct(formData);
+      addProduct(payload);
     }
 
     resetForm();
@@ -37,6 +59,8 @@ export default function Products() {
       price: 0,
       sale_price: undefined,
       description: '',
+      longDescription: '',
+      specsText: '',
       image: '',
       featured: false,
       stock: 0,
@@ -53,6 +77,8 @@ export default function Products() {
       price: product.price,
       sale_price: product.sale_price,
       description: product.description || '',
+      longDescription: product.longDescription || '',
+      specsText: product.specs ? Object.entries(product.specs).map(([k,v]) => `${k}: ${v}`).join('\n') : '',
       image: product.image || '',
       featured: product.featured || false,
       stock: product.stock || 0,
@@ -221,6 +247,28 @@ export default function Products() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={4}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="longDescription">Long Description</label>
+                <textarea
+                  id="longDescription"
+                  value={formData.longDescription}
+                  onChange={(e) => setFormData({ ...formData, longDescription: e.target.value })}
+                  rows={6}
+                  placeholder="Detailed information, usage notes, warranties, etc."
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="specs">Specifications (key: value per line)</label>
+                <textarea
+                  id="specs"
+                  value={formData.specsText}
+                  onChange={(e) => setFormData({ ...formData, specsText: e.target.value })}
+                  rows={6}
+                  placeholder={"Brand: Samsung\nSize: 55\"\nResolution: 4K\nPanel: QLED"}
                 />
               </div>
 

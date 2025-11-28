@@ -608,6 +608,10 @@ Edit `src/admin.css` and `src/pages/admin/*.css`:
 **Change Logo:**
 Replace `src/assets/maxnate-logo-white.svg`
 
+### Dual Favicon Behavior
+
+The public storefront uses the client's Swai Electronics favicon assets (`favicon.ico`, `favicon-32x32.png`, `favicon-16x16.png`). The protected CMS admin routes (`/admin/*`) automatically swap to a neutral MaxNate admin favicon (`admin-favicon.svg`) at runtime. This is handled by a React `useEffect` in `src/App.tsx` that replaces `<link rel="icon">` tags whenever navigation crosses into or out of `/admin`. No build‑time duplication required; both sets of icons live in `public/`.
+
 ---
 
 ## 📞 Support

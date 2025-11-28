@@ -6,6 +6,8 @@ export interface Product {
   sale_price?: number;
   image?: string;
   description?: string;
+  longDescription?: string;
+  specs?: Record<string, string>;
   featured?: boolean;
   stock?: number;
   created_at?: string;

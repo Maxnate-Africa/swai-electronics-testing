@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ClerkProvider, SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react';
 import { useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -33,6 +34,39 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function AppRoutes() {
+  const location = useLocation();
+  // Dynamically switch favicon between public site (client) and admin CMS (owner)
+  useEffect(() => {
+    const isAdmin = location.pathname.startsWith('/admin');
+    const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+    const clientIcons = [
+      { rel: 'icon', sizes: undefined, href: `${base}/favicon.ico`, type: 'image/x-icon' },
+      { rel: 'icon', sizes: '32x32', href: `${base}/favicon-32x32.png`, type: 'image/png' },
+      { rel: 'icon', sizes: '16x16', href: `${base}/favicon-16x16.png`, type: 'image/png' }
+    ];
+    const adminIcons = [
+      { rel: 'icon', sizes: undefined, href: `${base}/admin-favicon.svg`, type: 'image/svg+xml' }
+    ];
+
+    // Remove existing icon links we manage
+    const existing = document.querySelectorAll('head link[rel="icon"]');
+    existing.forEach(el => el.parentElement?.removeChild(el));
+
+    const setIcons = (defs: { rel: string; sizes: string | undefined; href: string; type: string }[]) => {
+      const head = document.head;
+      defs.forEach(def => {
+        const link = document.createElement('link');
+        link.rel = def.rel;
+        if (def.sizes) link.sizes = def.sizes;
+        link.href = def.href;
+        link.type = def.type;
+        head.appendChild(link);
+      });
+    };
+
+    setIcons(isAdmin ? adminIcons : clientIcons);
+  }, [location.pathname]);
+
   return (
     <Routes>
       {/* Public Routes */}

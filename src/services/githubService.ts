@@ -271,3 +271,39 @@ export async function getFilters(): Promise<Filters> {
 export async function updateFilters(filters: Filters): Promise<void> {
   await writeData(FILES.FILTERS, filters, 'Update filters configuration');
 }
+
+// ==================== BACKUP IMPORT ====================
+
+export interface BackupPayload {
+  products: Product[];
+  offers: Offer[];
+  filters: Filters;
+  exportDate?: string;
+}
+
+/**
+ * Import a full backup, overwriting products, offers, and filters files in one operation.
+ * Uses three commits (one per file) via the configured write mechanism (Worker or PAT).
+ */
+export async function importBackup(payload: BackupPayload): Promise<void> {
+  // Normalize products: ensure timestamps exist
+  const normalizedProducts = (payload.products || []).map(p => ({
+    ...p,
+    created_at: p.created_at || new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  }));
+
+  const normalizedOffers = payload.offers || [];
+  const normalizedFilters = payload.filters || {
+    show_all_link: true,
+    all_label: 'All Products',
+    show_sale_filter: true,
+    sale_label: 'On Sale',
+    categories: [],
+  };
+
+  // Write each file
+  await writeData(FILES.PRODUCTS, normalizedProducts, 'Import backup: products', 'products');
+  await writeData(FILES.OFFERS, normalizedOffers, 'Import backup: offers', 'offers');
+  await writeData(FILES.FILTERS, normalizedFilters, 'Import backup: filters');
+}

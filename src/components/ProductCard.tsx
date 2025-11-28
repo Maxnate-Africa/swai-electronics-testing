@@ -7,14 +7,14 @@ interface Props {
 
 export default function ProductCard({ product }: Props) {
   return (
-    <Link to={`/products/${product.id}`} className="product-card">
+    <div className="product-card" role="article" aria-label={product.title}>
       <div className="product-image">
         {product.image ? (
           <img src={product.image} alt={product.title} />
         ) : (
           <div className="placeholder">No image</div>
         )}
-        {product.sale_price && <span className="sale-badge">SALE</span>}
+        {product.sale_price && <span className="sale-badge" aria-label="On Sale">SALE</span>}
       </div>
       
       <div className="product-info">
@@ -32,6 +32,11 @@ export default function ProductCard({ product }: Props) {
           )}
         </div>
       </div>
-    </Link>
+      <div className="card-actions">
+        <Link to={`/products/${product.id}`} className="btn-item-details" aria-label={`View details for ${product.title}`}>
+          Item Details
+        </Link>
+      </div>
+    </div>
   );
 }

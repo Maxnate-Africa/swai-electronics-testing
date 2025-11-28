@@ -7,7 +7,8 @@ export default function ProductDetail() {
   const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    fetch('/data/products.json')
+    const base = import.meta.env.BASE_URL;
+    fetch(`${base}data/products.json`)
       .then(r => r.json())
       .then((data: { products: Product[] }) => {
         const found = data.products.find(p => p.id === id);
@@ -46,6 +47,24 @@ export default function ProductDetail() {
           <div className="description">
             <h3>Description</h3>
             <p>{product.description}</p>
+          </div>
+        )}
+
+        {product.longDescription && (
+          <div className="long-description">
+            <h3>Details</h3>
+            <p>{product.longDescription}</p>
+          </div>
+        )}
+
+        {product.specs && Object.keys(product.specs).length > 0 && (
+          <div className="specs">
+            <h3>Specifications</h3>
+            <ul>
+              {Object.entries(product.specs).map(([key, value]) => (
+                <li key={key}><strong>{key}:</strong> {value}</li>
+              ))}
+            </ul>
           </div>
         )}
 
