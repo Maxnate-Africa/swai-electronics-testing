@@ -16,5 +16,3 @@ CLERK_ISSUER = "https://vital-cicada-17.clerk.accounts.dev"
  # Optional comma separated allowlist of editor emails (lowercase). Leave empty to allow all authenticated users.
  ALLOWED_EMAILS = "maxnateafrica@gmail.com, victorswai04@gmail.com"
 
-[secrets]
-# GH_TOKEN will be set via `wrangler secret put GH_TOKEN`
