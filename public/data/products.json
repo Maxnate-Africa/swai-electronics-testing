@@ -81,6 +81,21 @@
       "specs": {},
       "published": true,
       "updated_at": "2025-11-28T16:50:31.195Z"
+    },
+    {
+      "title": "Iron",
+      "category": "home-appliances",
+      "price": 35000,
+      "longDescription": "",
+      "specs": {},
+      "image": "",
+      "featured": false,
+      "stock": 100,
+      "inStock": true,
+      "published": true,
+      "id": "1764348805396",
+      "created_at": "2025-11-28T16:53:25.396Z",
+      "updated_at": "2025-11-28T16:53:25.396Z"
     }
   ]
 }
