@@ -10,7 +10,12 @@
       "description": "Crystal clear 4K UHD display with smart features",
       "featured": true,
       "stock": 5,
-      "inStock": true
+      "inStock": true,
+      "longDescription": "",
+      "specs": {
+        "Screen": "very wide"
+      },
+      "updated_at": "2025-11-28T15:56:42.014Z"
     },
     {
       "id": "2",
