@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useUser, useClerk } from '@clerk/clerk-react';
 import maxnateLogo from '../assets/maxnate-logo-white.svg';
@@ -11,9 +11,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const { user } = useUser();
   const { signOut } = useClerk();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     signOut();
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
   };
 
   const navItems = [
@@ -62,8 +67,25 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="admin-layout">
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="mobile-overlay" 
+          onClick={closeMobileMenu}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 99,
+          }}
+        />
+      )}
+
       {/* Sidebar Navigation */}
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <img src={maxnateLogo} alt="MAXNATE Logo" className="brand-logo" />
         </div>
@@ -74,6 +96,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               key={item.path}
               to={item.path}
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+              onClick={closeMobileMenu}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -82,7 +105,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
           <div className="nav-divider"></div>
 
-          <button onClick={handleLogout} className="nav-item logout-btn">
+          <button onClick={() => { handleLogout(); closeMobileMenu(); }} className="nav-item logout-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
               <polyline points="16 17 21 12 16 7"></polyline>
@@ -97,6 +120,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className="admin-main">
         <header className="admin-header">
           <div className="header-content">
+            <button 
+              className="menu-toggle"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
             <h1 className="page-title">MaxCMS</h1>
             <div className="user-info">
               <span className="user-email">{user?.primaryEmailAddress?.emailAddress || user?.username}</span>
