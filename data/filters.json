@@ -1,7 +1,11 @@
 {
   "show_all_link": true,
-  "all_label": "All Products",
-  "show_sale_filter": true,
+  "all_label": "Products",
+  "show_sale_filter": false,
   "sale_label": "🏷️ Sale Items",
-  "categories": ["televisions", "audio", "home-appliances"]
+  "categories": [
+    "home-appliances",
+    "televisions",
+    "audio"
+  ]
 }
