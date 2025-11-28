@@ -86,6 +86,29 @@ async function getFileFromGitHub(path: string): Promise<GitHubFile | null> {
 }
 
 /**
+ * Fetch raw file content from GitHub without using the REST API.
+ * This avoids API rate limits for unauthenticated reads.
+ */
+async function getFileFromRaw(path: string): Promise<string | null> {
+  try {
+    const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${path}`;
+    const res = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'swai-electronics-admin'
+      }
+    });
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      throw new Error(`Raw fetch failed: ${res.status}`);
+    }
+    return await res.text();
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
  * Update or create file on GitHub
  */
 async function updateFileOnGitHub(
@@ -140,11 +163,21 @@ export async function verifyToken(): Promise<{ login: string } | null> {
  * Handles both wrapped objects { "key": [...] } and bare arrays
  */
 async function readData<T>(filePath: string, wrapKey?: string): Promise<T[]> {
-  const file = await getFileFromGitHub(filePath);
-  if (!file) {
-    return [];
+  // Prefer API for authenticated reads (freshest + SHA support); otherwise use raw to avoid rate limits.
+  let content: string | null = null;
+  if (RUNTIME_GH_TOKEN) {
+    const file = await getFileFromGitHub(filePath);
+    content = file?.content ?? null;
+  } else {
+    content = await getFileFromRaw(filePath);
+    // Fallback to API if raw failed (e.g., network), accepting potential rate limits
+    if (content == null) {
+      const file = await getFileFromGitHub(filePath);
+      content = file?.content ?? null;
+    }
   }
-  const parsed = JSON.parse(file.content);
+  if (!content) return [];
+  const parsed = JSON.parse(content);
   
   // If wrapKey provided, unwrap the object
   if (wrapKey && parsed[wrapKey]) {
@@ -254,8 +287,18 @@ export async function deleteOffer(id: string): Promise<void> {
 // ==================== FILTERS ====================
 
 export async function getFilters(): Promise<Filters> {
-  const file = await getFileFromGitHub(FILES.FILTERS);
-  if (!file) {
+  let content: string | null = null;
+  if (RUNTIME_GH_TOKEN) {
+    const file = await getFileFromGitHub(FILES.FILTERS);
+    content = file?.content ?? null;
+  } else {
+    content = await getFileFromRaw(FILES.FILTERS);
+    if (content == null) {
+      const file = await getFileFromGitHub(FILES.FILTERS);
+      content = file?.content ?? null;
+    }
+  }
+  if (!content) {
     // Return default filters structure
     return {
       show_all_link: true,
@@ -265,7 +308,7 @@ export async function getFilters(): Promise<Filters> {
       categories: []
     };
   }
-  return JSON.parse(file.content);
+  return JSON.parse(content);
 }
 
 export async function updateFilters(filters: Filters): Promise<void> {
