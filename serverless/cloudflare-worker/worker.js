@@ -65,9 +65,26 @@ export default {
         }
 
         const body = await request.json();
-        const { owner, repo, branch, path, content, message, sha } = body || {};
+        const { owner, repo, branch, path, content, message } = body || {};
+        let { sha } = body || {};
         if (!owner || !repo || !path || !content || !message) {
           return json({ error: 'Missing fields' }, 400, request, env);
+        }
+
+        // If SHA not provided, fetch current file to get it (required for updates)
+        if (!sha) {
+          const existingRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${branch || 'master'}`, {
+            headers: {
+              'Authorization': `token ${env.GH_TOKEN}`,
+              'Accept': 'application/vnd.github+json',
+              'User-Agent': 'Swai-Electronics-CMS-Worker/1.0'
+            }
+          });
+          if (existingRes.ok) {
+            const existingData = await existingRes.json();
+            sha = existingData.sha;
+          }
+          // If 404 (new file), sha stays undefined which is fine for creation
         }
 
         const ghRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
