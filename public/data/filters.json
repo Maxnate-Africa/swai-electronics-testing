@@ -3,5 +3,9 @@
   "all_label": "All Products",
   "show_sale_filter": true,
   "sale_label": "🏷️ Sale Items",
-  "categories": ["televisions", "audio", "home-appliances"]
+  "categories": [
+    "home-appliances",
+    "televisions",
+    "audio"
+  ]
 }
