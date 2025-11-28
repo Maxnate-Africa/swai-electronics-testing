@@ -186,13 +186,8 @@ export default function Settings() {
                     setWritePending(true);
                     setWriteStatus(null);
                     try {
-                      let token: string | null | undefined = null;
-                      try {
-                        token = await getToken({ template: 'default' });
-                      } catch (_) {
-                        // Fallback: try without template if none exists
-                        token = await getToken();
-                      }
+                      // Get standard Clerk JWT (no custom template needed)
+                      const token = await getToken();
                       if (!token) throw new Error('Could not get Clerk token. Are you signed in?');
                       const res = await fetch(`${WRITE_API_BASE}/update-file`, {
                         method: 'POST',
@@ -220,6 +215,9 @@ export default function Settings() {
                         let errorMsg = data.error || `HTTP ${res.status}`;
                         if (data.debug) {
                           errorMsg += `\n\nDebug Info:\nUser ID: ${data.debug.userId || 'N/A'}\nEmails: ${JSON.stringify(data.debug.emails) || 'N/A'}`;
+                          if (data.debug.allClaims) {
+                            errorMsg += `\n\nAll JWT Claims:\n${JSON.stringify(data.debug.allClaims, null, 2)}`;
+                          }
                         }
                         setWriteStatus({ ok: false, msg: errorMsg });
                       }

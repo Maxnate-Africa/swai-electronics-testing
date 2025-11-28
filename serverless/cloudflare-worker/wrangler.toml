@@ -18,5 +18,5 @@ CLERK_ISSUER = "https://vital-cicada-17.clerk.accounts.dev"
  # Optional comma separated allowlist of editor emails (lowercase). Leave empty to allow all authenticated users.
  ALLOWED_EMAILS = "maxnateafrica@gmail.com, victorswai04@gmail.com"
 	# Optional allowlist of Clerk user IDs (sub claim)
-	ALLOWED_USER_IDS = ""
+	ALLOWED_USER_IDS = "user_366BCXgK9jgcTloSWOSNUi1tU62"
 

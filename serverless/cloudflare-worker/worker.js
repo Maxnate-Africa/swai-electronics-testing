@@ -54,7 +54,11 @@ export default {
             const idMatches = allowedUserIds.length && userId ? allowedUserIds.includes(userId) : false;
 
             if ((allowed.length || allowedUserIds.length) && !emailMatches && !idMatches) {
-              const debug = env.DEBUG_IDS === 'true' ? { userId, emails: normalized } : undefined;
+              const debug = env.DEBUG_IDS === 'true' ? { 
+                userId, 
+                emails: normalized,
+                allClaims: claims  // Show all JWT claims for debugging
+              } : undefined;
               return json({ error: 'Forbidden: email/user not allowed', ... (debug ? { debug } : {}) }, 403, request, env);
             }
           }
