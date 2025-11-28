@@ -674,12 +674,17 @@
     padding: 1.5rem;
     border-radius: 12px;
     border-left: 4px solid var(--maxnate-teal);
+    overflow: hidden;
+    word-wrap: break-word;
+    word-break: break-word;
 }
 
 .settings-card h3 {
     font-size: 1.25rem;
     color: var(--maxnate-dark);
     margin-bottom: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .info-row {
@@ -687,6 +692,8 @@
     justify-content: space-between;
     padding: 0.75rem 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    gap: 1rem;
+    overflow: hidden;
 }
 
 .info-row:last-child {
@@ -696,11 +703,16 @@
 .info-label {
     font-weight: 600;
     color: var(--maxnate-gray);
+    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .info-value {
     color: var(--maxnate-dark);
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
 }
 
 .stats-grid {
@@ -726,17 +738,22 @@
 .stat-label {
     font-size: 0.85rem;
     color: var(--maxnate-gray);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .settings-description {
     color: var(--maxnate-gray);
     line-height: 1.6;
     margin-bottom: 1rem;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 
 .button-group {
     display: flex;
     gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 /* ==================== RESPONSIVE ==================== */
