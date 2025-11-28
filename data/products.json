@@ -1,0 +1,66 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "title": "Samsung 55\" 4K Smart TV",
+      "category": "televisions",
+      "price": 850000,
+      "sale_price": 750000,
+      "image": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400",
+      "description": "Crystal clear 4K UHD display with smart features",
+      "featured": true,
+      "stock": 5
+    },
+    {
+      "id": "2",
+      "title": "Sony Wireless Headphones",
+      "category": "audio",
+      "price": 180000,
+      "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400",
+      "description": "Premium noise-canceling wireless headphones",
+      "featured": false,
+      "stock": 12
+    },
+    {
+      "id": "3",
+      "title": "LG Front Load Washing Machine",
+      "category": "home-appliances",
+      "price": 650000,
+      "sale_price": 580000,
+      "image": "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=400",
+      "description": "8kg capacity with inverter technology",
+      "featured": true,
+      "stock": 3
+    },
+    {
+      "id": "4",
+      "title": "JBL Bluetooth Speaker",
+      "category": "audio",
+      "price": 95000,
+      "image": "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400",
+      "description": "Portable waterproof speaker with deep bass",
+      "featured": false,
+      "stock": 20
+    },
+    {
+      "id": "5",
+      "title": "Hisense 43\" LED TV",
+      "category": "televisions",
+      "price": 420000,
+      "image": "https://images.unsplash.com/photo-1567690187548-f07b1d7bf5a9?w=400",
+      "description": "Full HD LED TV with excellent picture quality",
+      "featured": false,
+      "stock": 8
+    },
+    {
+      "id": "6",
+      "title": "Samsung Microwave Oven",
+      "category": "home-appliances",
+      "price": 185000,
+      "image": "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?w=400",
+      "description": "23L capacity with grill function",
+      "featured": false,
+      "stock": 15
+    }
+  ]
+}

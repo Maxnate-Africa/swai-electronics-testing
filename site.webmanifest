@@ -1,0 +1,10 @@
+{
+  "name": "Swai Electronics",
+  "short_name": "Swai",
+  "start_url": "/swai-electronics/",
+  "scope": "/swai-electronics/",
+  "display": "standalone",
+  "theme_color": "#1a73e8",
+  "background_color": "#ffffff",
+  "lang": "en"
+}

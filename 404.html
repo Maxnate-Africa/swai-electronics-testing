@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Redirecting…</title>
+    <!-- Prevent favicon/manifest 404s on deep links before redirect -->
+    <link rel="icon" type="image/x-icon" href="/swai-electronics-testing/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/swai-electronics-testing/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/swai-electronics-testing/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/swai-electronics-testing/apple-touch-icon.png" />
+    <link rel="manifest" href="/swai-electronics-testing/site.webmanifest" />
+    <script>
+      // Single Page App redirect for GitHub Pages
+      // Preserves the path so React Router can handle it
+      (function() {
+        var base = '/swai-electronics-testing';
+        var path = window.location.pathname;
+        var search = window.location.search;
+        var hash = window.location.hash;
+        
+        // Store the intended path in sessionStorage so the app can read it
+        if (path.startsWith(base)) {
+          // Already has base, redirect to index with the path stored
+          var relativePath = path.slice(base.length) || '/';
+          sessionStorage.setItem('spa-redirect', relativePath + search + hash);
+          window.location.replace(base + '/' + search + hash);
+        } else {
+          // Path doesn't have base, just go to base
+          window.location.replace(base + '/');
+        }
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
