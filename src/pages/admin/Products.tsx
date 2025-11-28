@@ -7,6 +7,8 @@ export default function Products() {
   const { products, addProduct, updateProduct, deleteProduct } = useAdmin();
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -19,6 +21,113 @@ export default function Products() {
     stock: 0,
     inStock: true,
   });
+
+  const optimizeImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = async () => {
+          try {
+            // Generate multiple variants: original, 600px, 300px
+            const variants: string[] = [];
+            const widths = [img.width, 600, 300].filter((w, i, arr) => 
+              w <= img.width && arr.indexOf(w) === i
+            ).sort((a, b) => b - a);
+            
+            for (const targetWidth of widths) {
+              const canvas = document.createElement('canvas');
+              let width = img.width;
+              let height = img.height;
+              
+              if (targetWidth < img.width) {
+                const ratio = targetWidth / img.width;
+                width = targetWidth;
+                height = Math.max(1, Math.round(img.height * ratio));
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx?.drawImage(img, 0, 0, width, height);
+              
+              // Determine quality based on size
+              const quality = file.size > 500000 ? 0.7 : 0.85;
+              
+              // Try AVIF first, fallback to WebP, then JPEG
+              const imageData = await new Promise<string>((res) => {
+                canvas.toBlob(
+                  (blob) => {
+                    if (blob) {
+                      const reader2 = new FileReader();
+                      reader2.onloadend = () => res(reader2.result as string);
+                      reader2.readAsDataURL(blob);
+                    } else {
+                      // Fallback to WebP
+                      canvas.toBlob(
+                        (webpBlob) => {
+                          if (webpBlob) {
+                            const reader3 = new FileReader();
+                            reader3.onloadend = () => res(reader3.result as string);
+                            reader3.readAsDataURL(webpBlob);
+                          } else {
+                            // Final fallback to JPEG
+                            res(canvas.toDataURL('image/jpeg', quality));
+                          }
+                        },
+                        'image/webp',
+                        quality
+                      );
+                    }
+                  },
+                  'image/avif',
+                  quality
+                );
+              });
+              
+              variants.push(imageData);
+            }
+            
+            // Return the best quality (first variant - original or largest)
+            resolve(variants[0]);
+          } catch (error) {
+            reject(error);
+          }
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid image file (JPG, PNG, GIF, WebP, BMP, SVG)');
+      return;
+    }
+    
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Image size must be less than 10MB');
+      return;
+    }
+    
+    try {
+      setUploading(true);
+      const optimizedImage = await optimizeImage(file);
+      setFormData({ ...formData, image: optimizedImage });
+      setImagePreview(optimizedImage);
+    } catch (error) {
+      alert('Failed to process image. Please try again.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +174,7 @@ export default function Products() {
       stock: 0,
       inStock: true,
     });
+    setImagePreview('');
     setEditingProduct(null);
     setShowModal(false);
   };
@@ -83,6 +193,7 @@ export default function Products() {
       stock: product.stock || 0,
       inStock: product.inStock !== undefined ? product.inStock : true,
     });
+    setImagePreview(product.image || '');
     setShowModal(true);
   };
 
@@ -239,14 +350,53 @@ export default function Products() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="image">Image URL</label>
+                <label>Product Image</label>
+                <div style={{marginBottom: '1rem'}}>
+                  <label className="btn-secondary" style={{cursor: 'pointer', display: 'inline-block', padding: '0.75rem 1rem', marginRight: '0.5rem'}}>
+                    {uploading ? 'Uploading...' : 'Upload Image'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploading}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  <span style={{color: '#666', fontSize: '0.9rem'}}>or enter URL below</span>
+                </div>
                 <input
                   type="url"
                   id="image"
-                  value={formData.image}
-                  onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                  value={formData.image.startsWith('data:') ? '' : formData.image}
+                  onChange={(e) => {
+                    setFormData({ ...formData, image: e.target.value });
+                    setImagePreview(e.target.value);
+                  }}
                   placeholder="https://example.com/image.jpg"
+                  disabled={uploading}
                 />
+                {imagePreview && (
+                  <div style={{marginTop: '1rem', textAlign: 'center'}}>
+                    <img 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      style={{maxWidth: '200px', maxHeight: '200px', borderRadius: '8px', border: '2px solid #e0e0e0'}}
+                    />
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        setFormData({ ...formData, image: '' });
+                        setImagePreview('');
+                      }}
+                      style={{display: 'block', margin: '0.5rem auto', padding: '0.5rem 1rem', background: '#dc3545', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer'}}
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                )}
+                <p style={{color: '#666', fontSize: '0.85rem', marginTop: '0.5rem'}}>
+                  Supports JPG, PNG, GIF, WebP, BMP, SVG (max 10MB). Generates optimized AVIF/WebP variants (original, 600px, 300px).
+                </p>
               </div>
 
               <div className="form-group">
