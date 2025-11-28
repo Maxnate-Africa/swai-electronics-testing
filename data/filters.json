@@ -1,9 +1,10 @@
 {
   "show_all_link": true,
   "all_label": "All",
-  "show_sale_filter": true,
+  "show_sale_filter": false,
   "sale_label": "🏷️ Sale Items",
   "categories": [
+    "Generators",
     "audio",
     "televisions",
     "home-appliances"

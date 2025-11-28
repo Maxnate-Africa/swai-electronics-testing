@@ -6,7 +6,7 @@
       "discount": "30% OFF",
       "expiry": "2025-12-01",
       "description": "All TVs on discount!",
-      "active": true
+      "active": false
     },
     {
       "id": "2",
@@ -14,7 +14,7 @@
       "discount": "FREE SHIPPING",
       "expiry": "2025-12-31",
       "description": "On orders above 200,000 TZS",
-      "active": true
+      "active": false
     }
   ]
 }
