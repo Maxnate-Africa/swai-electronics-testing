@@ -8,7 +8,7 @@ CORS_ORIGINS = "http://localhost:5173, https://maxnate-africa.github.io"
 # Enforce JWT verification for writes
 REQUIRE_AUTH = "true"
 # Include user id/email hints in 403 responses when true (for onboarding/debug)
-DEBUG_IDS = "true"
+DEBUG_IDS = "false"
 # Set these after retrieving your Clerk instance domain from dashboard:
 # Example domain: vital-cicada-17.clerk.accounts.dev
 # JWKS URL format: https://<domain>/.well-known/jwks.json
